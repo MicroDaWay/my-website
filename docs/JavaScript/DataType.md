@@ -147,7 +147,7 @@ sidebar_position: 2
 - 七种原始值是构成各种数据的基石
 - 原始值在 JS 中是不可变类型，一旦创建就不能修改
 
-[JS002.png](../../static/img/JS002.png)
+![JS002.png](../../static/img/JS002.png)
 
 ```html
 <!DOCTYPE html>
@@ -224,7 +224,7 @@ sidebar_position: 2
 </html>
 ```
 
-[JS003.png](../../static/img/JS003.png)
+![JS003.png](../../static/img/JS003.png)
 
 ## 类型转换-数值
 

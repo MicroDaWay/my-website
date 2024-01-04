@@ -1096,9 +1096,8 @@ sidebar_position: 9
 </html>
 ```
 
-![[Vue2生命周期01.png]]
-
-![[Vue2生命周期02.png]]
+![Vue2 生命周期 01.png](../static/img/Vue2生命周期01.png)
+![Vue2 生命周期 02.png](../static/img/Vue2生命周期02.png)
 
 ## 非单文件组件
 
@@ -1406,7 +1405,7 @@ sidebar_position: 9
 - 一个重要的内置关系：`VueComponent.prototype.__proto__ === Vue.prototype`
 - 为什么要有这个关系：让组件实例对象 vc 可以访问到 Vue 原型上的属性和方法
 
-![[VueComponent.png]]
+![VueComponent.png](../static/img/VueComponent.png)
 
 ```html
 <!DOCTYPE html>
@@ -2724,4 +2723,954 @@ button {
   margin: 0 5px;
 }
 </style>
+```
+
+## getters 配置项
+
+**store/index.js**
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const state = {
+  sum: 0,
+}
+
+const mutations = {
+  addMutation(state, value) {
+    state.sum += value
+  },
+  subMutation(state, value) {
+    state.sum -= value
+  },
+}
+
+const actions = {
+  addOddAction(context, value) {
+    if (context.state.sum % 2 === 1) {
+      context.commit('addMutation', value)
+    }
+  },
+  addWaitAction(context, value) {
+    setTimeout(() => {
+      context.commit('addMutation', value)
+    }, 1000)
+  },
+}
+
+const getters = {
+  bigSum(state) {
+    return state.sum * 10
+  },
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters,
+})
+```
+
+**Count.vue**
+
+```js
+<template>
+  <div>
+    <h2>当前求和为：{{ $store.state.sum }}</h2>
+    <h2>当前求和放大十倍为：{{ $store.getters.bigSum }}</h2>
+    <select v-model="n">
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="addHandler">+</button>
+    <button @click="subHandler">-</button>
+    <button @click="addOddHandler">当前求和为奇数再加</button>
+    <button @click="addWaitHandler">等一等再加</button>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      n: 1,
+    }
+  },
+  methods: {
+    addHandler() {
+      this.$store.commit('addMutation', this.n)
+    },
+    subHandler() {
+      this.$store.commit('subMutation', this.n)
+    },
+    addOddHandler() {
+      this.$store.dispatch('addOddAction', this.n)
+    },
+    addWaitHandler() {
+      this.$store.dispatch('addWaitAction', this.n)
+    },
+  },
+}
+</script>
+
+<style scoped>
+button {
+  margin: 0 5px;
+}
+</style>
+```
+
+## mapState 与 mapGetters
+
+**store/index.js**
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const state = {
+  sum: 0,
+  school: '北京大学',
+  subject: '前端',
+}
+
+const mutations = {
+  addMutation(state, value) {
+    state.sum += value
+  },
+  subMutation(state, value) {
+    state.sum -= value
+  },
+}
+
+const actions = {
+  addOddAction(context, value) {
+    if (context.state.sum % 2 === 1) {
+      context.commit('addMutation', value)
+    }
+  },
+  addWaitAction(context, value) {
+    setTimeout(() => {
+      context.commit('addMutation', value)
+    }, 1000)
+  },
+}
+
+const getters = {
+  bigSum(state) {
+    return state.sum * 10
+  },
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters,
+})
+```
+
+**Count.vue**
+
+```js
+<template>
+  <div>
+    <h2>当前求和为：{{ sum }}</h2>
+    <h2>当前求和放大十倍为：{{ bigSum }}</h2>
+    <h2>学校：{{ school }}</h2>
+    <h2>学科：{{ subject }}</h2>
+    <select v-model="n">
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="addHandler">+</button>
+    <button @click="subHandler">-</button>
+    <button @click="addOddHandler">当前求和为奇数再加</button>
+    <button @click="addWaitHandler">等一等再加</button>
+  </div>
+</template>
+
+<script>
+import { mapState, mapGetters } from 'vuex'
+
+export default {
+  data() {
+    return {
+      n: 1,
+    }
+  },
+  computed: {
+    // 手动编写计算属性
+    // sum() {
+    //   return this.$store.state.sum
+    // },
+    // school() {
+    //   return this.$store.state.school
+    // },
+    // subject() {
+    //   return this.$store.state.subject
+    // },
+    // bigSum() {
+    //   return this.$store.getters.bigSum
+    // },
+
+    // 借助mapState生成计算属性，从state中读取属性(对象写法)
+    // ...mapState({
+    //   sum: 'sum',
+    //   school: 'school',
+    //   subject: 'subject',
+    // }),
+
+    // 借助mapGetters生成计算属性，从getters中读取属性(对象写法)
+    // ...mapGetters({
+    //   bigSum: 'bigSum',
+    // }),
+
+    // 借助mapState生成计算属性，从state中读取属性(数组写法)
+    ...mapState(['sum', 'school', 'subject']),
+
+    // 借助mapGetters生成计算属性，从getters中读取属性(数组写法)
+    ...mapGetters(['bigSum']),
+  },
+  methods: {
+    addHandler() {
+      this.$store.commit('addMutation', this.n)
+    },
+    subHandler() {
+      this.$store.commit('subMutation', this.n)
+    },
+    addOddHandler() {
+      this.$store.dispatch('addOddAction', this.n)
+    },
+    addWaitHandler() {
+      this.$store.dispatch('addWaitAction', this.n)
+    },
+  },
+}
+</script>
+
+<style scoped>
+button {
+  margin: 0 5px;
+}
+</style>
+```
+
+## mapMutations 与 mapActions 对象写法
+
+**store/index.js**
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const state = {
+  sum: 0,
+  school: '北京大学',
+  subject: '前端',
+}
+
+const mutations = {
+  addMutation(state, value) {
+    state.sum += value
+  },
+  subMutation(state, value) {
+    state.sum -= value
+  },
+}
+
+const actions = {
+  addOddAction(context, value) {
+    if (context.state.sum % 2 === 1) {
+      context.commit('addMutation', value)
+    }
+  },
+  addWaitAction(context, value) {
+    setTimeout(() => {
+      context.commit('addMutation', value)
+    }, 1000)
+  },
+}
+
+const getters = {
+  bigSum(state) {
+    return state.sum * 10
+  },
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters,
+})
+```
+
+**Count.vue**
+
+```js
+<template>
+  <div>
+    <h2>当前求和为：{{ sum }}</h2>
+    <h2>当前求和放大十倍为：{{ bigSum }}</h2>
+    <h2>学校：{{ school }}</h2>
+    <h2>学科：{{ subject }}</h2>
+    <select v-model="n">
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="addHandler(n)">+</button>
+    <button @click="subHandler(n)">-</button>
+    <button @click="addOddHandler(n)">当前求和为奇数再加</button>
+    <button @click="addWaitHandler(n)">等一等再加</button>
+  </div>
+</template>
+
+<script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+
+export default {
+  data() {
+    return {
+      n: 1,
+    }
+  },
+  computed: {
+    ...mapState(['sum', 'school', 'subject']),
+    ...mapGetters(['bigSum']),
+  },
+  methods: {
+    // 手动编写方法
+    // addHandler() {
+    //   this.$store.commit('addMutation', this.n)
+    // },
+    // subHandler() {
+    //   this.$store.commit('subMutation', this.n)
+    // },
+    // addOddHandler() {
+    //   this.$store.dispatch('addOddAction', this.n)
+    // },
+    // addWaitHandler() {
+    //   this.$store.dispatch('addWaitAction', this.n)
+    // },
+
+    ...mapMutations({
+      addHandler: 'addMutation',
+      subHandler: 'subMutation',
+    }),
+
+    ...mapActions({
+      addOddHandler: 'addOddAction',
+      addWaitHandler: 'addWaitAction',
+    }),
+  },
+}
+</script>
+
+<style scoped>
+button {
+  margin: 0 5px;
+}
+</style>
+```
+
+## mapMutations 与 mapGetters 的数组写法
+
+**store/inde.js**
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const state = {
+  sum: 0,
+  school: '北京大学',
+  subject: '前端',
+}
+
+const mutations = {
+  addMutation(state, value) {
+    state.sum += value
+  },
+  subMutation(state, value) {
+    state.sum -= value
+  },
+}
+
+const actions = {
+  addOddAction(context, value) {
+    if (context.state.sum % 2 === 1) {
+      context.commit('addMutation', value)
+    }
+  },
+  addWaitAction(context, value) {
+    setTimeout(() => {
+      context.commit('addMutation', value)
+    }, 1000)
+  },
+}
+
+const getters = {
+  bigSum(state) {
+    return state.sum * 10
+  },
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters,
+})
+```
+
+**Count.vue**
+
+```js
+<template>
+  <div>
+    <h2>当前求和为：{{ sum }}</h2>
+    <h2>当前求和放大十倍为：{{ bigSum }}</h2>
+    <h2>学校：{{ school }}</h2>
+    <h2>学科：{{ subject }}</h2>
+    <select v-model="n">
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="addMutation(n)">+</button>
+    <button @click="subMutation(n)">-</button>
+    <button @click="addOddAction(n)">当前求和为奇数再加</button>
+    <button @click="addWaitAction(n)">等一等再加</button>
+  </div>
+</template>
+
+<script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+
+export default {
+  data() {
+    return {
+      n: 1,
+    }
+  },
+  computed: {
+    ...mapState(['sum', 'school', 'subject']),
+    ...mapGetters(['bigSum']),
+  },
+  methods: {
+    ...mapMutations(['addMutation', 'subMutation']),
+    ...mapActions(['addOddAction', 'addWaitAction']),
+  },
+}
+</script>
+
+<style scoped>
+button {
+  margin: 0 5px;
+}
+</style>
+```
+
+## 多组件共享数据
+
+**store/index.js**
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const state = {
+  sum: 0,
+  school: '北京大学',
+  subject: '前端',
+  personList: [
+    {
+      id: 1,
+      name: '孙悟空',
+    },
+    {
+      id: 2,
+      name: '猪八戒',
+    },
+    {
+      id: 3,
+      name: '沙和尚',
+    },
+  ],
+}
+
+const mutations = {
+  addMutation(state, value) {
+    state.sum += value
+  },
+  subMutation(state, value) {
+    state.sum -= value
+  },
+  addPersonMutation(state, value) {
+    state.personList.push(value)
+  },
+}
+
+const actions = {
+  addOddAction(context, value) {
+    if (context.state.sum % 2 === 1) {
+      context.commit('addMutation', value)
+    }
+  },
+  addWaitAction(context, value) {
+    setTimeout(() => {
+      context.commit('addMutation', value)
+    }, 1000)
+  },
+}
+
+const getters = {
+  bigSum(state) {
+    return state.sum * 10
+  },
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  actions,
+  getters,
+})
+```
+
+**Count.vue**
+
+```js
+<template>
+  <div>
+    <h2>当前求和为：{{ sum }}</h2>
+    <h2>当前求和放大十倍为：{{ bigSum }}</h2>
+    <h2 style="color: red">Person组件的人数为：{{ personList.length }}</h2>
+    <h2>学校：{{ school }}</h2>
+    <h2>学科：{{ subject }}</h2>
+    <select v-model="n">
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="addMutation(n)">+</button>
+    <button @click="subMutation(n)">-</button>
+    <button @click="addOddAction(n)">当前求和为奇数再加</button>
+    <button @click="addWaitAction(n)">等一等再加</button>
+  </div>
+</template>
+
+<script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+
+export default {
+  data() {
+    return {
+      n: 1,
+    }
+  },
+  computed: {
+    ...mapState(['sum', 'school', 'subject', 'personList']),
+    ...mapGetters(['bigSum']),
+  },
+  methods: {
+    ...mapMutations(['addMutation', 'subMutation']),
+    ...mapActions(['addOddAction', 'addWaitAction']),
+  },
+}
+</script>
+
+<style scoped>
+button {
+  margin: 0 5px;
+}
+</style>
+```
+
+**Person.vue**
+
+```js
+<template>
+  <div>
+    <h2 style="color: red">Count组件的和为：{{ sum }}</h2>
+    <input type="text" v-model="name" />
+    <button @click="addPersonMutation({ id: Date.now(), name })">添加</button>
+    <ul>
+      <li v-for="item in personList" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import { mapState, mapMutations } from 'vuex'
+
+export default {
+  data() {
+    return {
+      name: '',
+    }
+  },
+  computed: {
+    ...mapState(['personList', 'sum']),
+  },
+  methods: {
+    ...mapMutations(['addPersonMutation']),
+  },
+}
+</script>
+
+<style scoped></style>
+```
+
+## Vuex 模块化
+
+**store/index.js**
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import count from './modules/count'
+import person from './modules/person'
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+  modules: {
+    count,
+    person,
+  },
+})
+```
+
+**store/module/count.js**
+
+```js
+export default {
+  namespaced: true,
+  state: () => ({
+    sum: 0,
+    school: '北京大学',
+    subject: '前端',
+  }),
+  mutations: {
+    addMutation(state, value) {
+      state.sum += value
+    },
+    subMutation(state, value) {
+      state.sum -= value
+    },
+  },
+  actions: {
+    addOddAction(context, value) {
+      if (context.state.sum % 2 === 1) {
+        context.commit('addMutation', value)
+      }
+    },
+    addWaitAction(context, value) {
+      setTimeout(() => {
+        context.commit('addMutation', value)
+      }, 1000)
+    },
+  },
+  getters: {
+    bigSum(state) {
+      return state.sum * 10
+    },
+  },
+}
+```
+
+**store/modules.person.js**
+
+```js
+export default {
+  namespaced: true,
+  state: () => ({
+    personList: [
+      { id: 1, name: '孙悟空' },
+      { id: 2, name: '猪八戒' },
+      { id: 3, name: '沙和尚' },
+    ],
+  }),
+  mutations: {
+    addPersonMutation(state, value) {
+      state.personList.push(value)
+    },
+  },
+  actions: {
+    addPersonWangAction(context, value) {
+      if (value.name.startsWith('王')) {
+        context.commit('addPersonMutation', value)
+      } else {
+        alert('只能添加姓王的人')
+      }
+    },
+  },
+  getters: {
+    firstPersonName(state) {
+      return state.personList[0]
+    },
+  },
+}
+```
+
+**Count.vue**
+
+```js
+<template>
+  <div>
+    <h2>当前求和为：{{ sum }}</h2>
+    <h2>当前求和放大十倍为：{{ bigSum }}</h2>
+    <h2 style="color: red">Person组件的人数为：{{ personList.length }}</h2>
+    <h2>学校：{{ school }}</h2>
+    <h2>学科：{{ subject }}</h2>
+    <select v-model="n">
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="addMutation(n)">+</button>
+    <button @click="subMutation(n)">-</button>
+    <button @click="addOddAction(n)">当前求和为奇数再加</button>
+    <button @click="addWaitAction(n)">等一等再加</button>
+  </div>
+</template>
+
+<script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+
+export default {
+  data() {
+    return {
+      n: 1,
+    }
+  },
+  computed: {
+    ...mapState('count', ['sum', 'school', 'subject']),
+    ...mapState('person', ['personList']),
+    ...mapGetters('count', ['bigSum']),
+  },
+  methods: {
+    ...mapMutations('count', ['addMutation', 'subMutation']),
+    ...mapActions('count', ['addOddAction', 'addWaitAction']),
+  },
+}
+</script>
+
+<style scoped>
+button {
+  margin: 0 5px;
+}
+</style>
+```
+
+**Person.vue**
+
+```js
+<template>
+  <div>
+    <h2 style="color: red">Count组件的和为：{{ sum }}</h2>
+    <h2>列表中第一个人的姓名为：{{ firstPersonName }}</h2>
+    <input type="text" v-model.trim="name" />
+    <button @click="addPersonHandler">添加</button>
+    <button @click="addPersonWangHandler">添加姓王的人</button>
+    <ul>
+      <li v-for="item in personList" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      name: '',
+    }
+  },
+  computed: {
+    sum() {
+      return this.$store.state.count.sum
+    },
+    personList() {
+      return this.$store.state.person.personList
+    },
+    firstPersonName() {
+      return this.$store.getters['person/firstPersonName'].name
+    },
+  },
+  methods: {
+    addPersonHandler() {
+      this.$store.commit('person/addPersonMutation', {
+        id: Date.now(),
+        name: this.name,
+      })
+      this.name = ''
+    },
+    addPersonWangHandler() {
+      this.$store.dispatch('person/addPersonWangAction', {
+        id: Date.now(),
+        name: this.name,
+      })
+      this.name = ''
+    },
+  },
+}
+</script>
+
+<style scoped></style>
+```
+
+## 路由
+
+- 理解：一个路由(route)就是一组映射关系(key-value)，多个路由需要路由器(router)进行管理
+- 前端路由：key 是路径，value 是组件
+
+### 基本使用
+
+- 安装 vue-router，命令：`npm i vue-router@3`
+- 应用插件：`Vue.use(VueRouter)`
+
+**main.js**
+
+```js
+import App from '@/App.vue'
+import Vue from 'vue'
+import router from '@/router'
+import VueRouter from 'vue-router'
+
+Vue.config.productionTip = false
+Vue.use(VueRouter)
+
+new Vue({
+  render: (h) => h(App),
+  router,
+}).$mount('#app')
+```
+
+**router/index.js**
+
+```js
+import About from '@/components/About.vue'
+import Home from '@/components/Home.vue'
+import VueRouter from 'vue-router'
+
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/home',
+      component: Home,
+    },
+    {
+      path: '/about',
+      component: About,
+    },
+  ],
+})
+
+export default router
+```
+
+**App.vue**
+
+```js
+<template>
+  <div>
+    <h2>Vue Router Demo</h2>
+    <div class="container">
+      <div class="left">
+        <router-link to="/home">Home</router-link>
+        <router-link to="/about">About</router-link>
+      </div>
+      <router-view></router-view>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {}
+  },
+}
+</script>
+
+<style scoped>
+.container {
+  display: flex;
+
+  .left {
+    display: flex;
+    flex-flow: column;
+    width: 100px;
+    height: 100px;
+
+    a {
+      width: 100%;
+      height: 50px;
+      text-decoration: none;
+      color: inherit;
+
+      &.router-link-active {
+        background-color: skyblue;
+      }
+    }
+  }
+}
+</style>
+```
+
+**Home.vue**
+
+```js
+<template>
+  <div>
+    <h2>Home</h2>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {}
+  },
+}
+</script>
+
+<style scoped></style>
+```
+
+**About.vue**
+
+```js
+<template>
+  <div>
+    <h2>About</h2>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {}
+  },
+}
+</script>
+
+<style scoped></style>
 ```

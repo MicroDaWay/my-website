@@ -420,8 +420,8 @@ for(let 变量 of 可迭代的对象){
 - 复制必须要产生新的对象
 - 当调用 slice 时，会产生一个新的数组对象，从而完成对数组的复制
 
-[JS009.png](../../static/img/JS009.png)
-[JS010.png](../../static/img/JS010.png)
+![JS009.png](../../static/img/JS009.png)
+![JS010.png](../../static/img/JS010.png)
 
 ```html
 <!DOCTYPE html>
