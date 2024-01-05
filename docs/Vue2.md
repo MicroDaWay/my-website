@@ -3674,3 +3674,246 @@ export default {
 
 <style scoped></style>
 ```
+
+### 几个注意点
+
+- 路由组件通常存放在 `pages` 文件夹，一般组件通常存放在 `components` 文件夹
+- 通过切换，隐藏了的路由组件，默认是被销毁掉的，需要的时候再去挂载
+- 每个组件都有自己的 `$route` 属性，里面存储着自己的路由信息
+- 整个应用只有一个 router，可以通过组件的 `$router` 属性获取到
+
+### 嵌套路由
+
+配置路由规则，使用 `children` 配置项
+
+```js
+import About from '@/pages/About.vue'
+import Home from '@/pages/Home.vue'
+import Message from '@/pages/Message.vue'
+import News from '@/pages/News.vue'
+import VueRouter from 'vue-router'
+
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/home',
+      component: Home,
+      children: [
+        // 通过children配置子级路由
+        {
+          path: 'news', // 此处一定不要写：/news
+          component: News,
+        },
+        {
+          path: 'message', // 此处一定不要写：/message
+          component: Message,
+        },
+      ],
+    },
+    {
+      path: '/about',
+      component: About,
+    },
+  ],
+})
+
+export default router
+```
+
+跳转(要写完整路径)
+
+```js
+<router-link to="/home/news">News</router-link>
+```
+
+### 路由的 query 参数
+
+传递参数
+
+```js
+// 跳转路由并携带query参数，to的字符串写法
+<router-link :to="`/home/message/details?id=${item.id}&title=${item.title}`">
+  {{ item.title }}
+</router-link>
+
+// 跳转路由并携带query参数，to的对象写法
+<router-link
+  :to="{
+    path: '/home/message/details',
+    query: {
+      id: item.id,
+      title: item.title,
+    },
+  }"
+>
+  {{ item.title }}
+</router-link>
+```
+
+接收参数
+
+```js
+$route.query.id
+$route.query.title
+```
+
+### 命名路由
+
+作用：可以简化路由的跳转
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/home',
+      component: Home,
+      children: [
+        {
+          path: 'news',
+          component: News,
+        },
+        {
+          path: 'message',
+          component: Message,
+          children: [
+            {
+              name: 'xiangqing', // 给路由命名
+              path: 'details',
+              component: Details,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+})
+
+export default router
+```
+
+```js
+<router-link
+  :to="{
+    name: 'xiangqing',
+    query: {
+      id: item.id,
+      title: item.title,
+    },
+  }"
+>
+  {{ item.title }}
+</router-link>
+```
+
+### 路由的 params 参数
+
+配置路由，声明接收 params 参数
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/home',
+      component: Home,
+      children: [
+        {
+          path: 'news',
+          component: News,
+        },
+        {
+          path: 'message',
+          component: Message,
+          children: [
+            {
+              name: 'xiangqing',
+              path: 'details/:id/:title', // 使用占位符声明接收params参数
+              component: Details,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+})
+```
+
+传递参数
+
+```js
+// 跳转路由并携带params参数，to的字符串写法
+<router-link :to="`/home/message/details/${item.id}/${item.title}`">
+  {{ item.title }}
+</router-link>
+
+// 跳转路由并携带params参数，to的对象写法
+<router-link
+  :to="{
+    name: 'xiangqing',
+    params: {
+      id: item.id,
+      title: item.title,
+    },
+  }"
+>
+  {{ item.title }}
+</router-link>
+```
+
+**特别注意：路由携带 params 参数时，若使用 to 的对象写法，则不能使用 path 配置项，必须使用 name 配置**
+
+接收参数
+
+```js
+$route.params.id
+$route.params.title
+```
+
+### 路由的 props 配置
+
+作用：让路由组件更方便的收到参数
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      {
+        name: 'xiangqing',
+        path: 'details/:id/:title',
+        component: Details,
+
+        // 第一种写法：props值为对象，该对象中所有的key-value的组合最终都会通过props传给Details组件
+        // props: {
+        //   id: 1,
+        //   title: 'hello',
+        // },
+
+        // 第二种写法：props值为布尔值，布尔值为true，则把路由收到的所有params参数通过props传给Details组件
+        // props: true,
+
+        // 第三种写法：props值为函数，该函数返回的对象中每一组key-value都会通过props传给Details组件
+        props: (route) => {
+          return {
+            id: route.params.id,
+            title: route.params.title,
+          }
+        },
+      },
+    },
+  ],
+})
+```
+
+```js
+<template>
+  <ul>
+    <li>消息编号：{{ id }}</li>
+    <li>消息标题：{{ title }}</li>
+  </ul>
+</template>
+
+<script>
+export default {
+  props: ['id', 'title'],
+}
+</script>
+```
