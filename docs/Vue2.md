@@ -3917,3 +3917,154 @@ export default {
 }
 </script>
 ```
+
+### router-link 的 replace 属性
+
+作用：控制路由跳转时操作浏览器历史记录的模式
+
+浏览器的历史记录有两种写入方式：分别为 push 和 replace，push 是追加历史记录，replace 是替换当前记录，路由跳转时默认为 push
+
+如何开启 replace 模式：`<router-link replace to="/home/message">Message</router-link>`
+
+### 编程式路由导航
+
+作用：不借助 router-link 实现路由跳转，让路由跳转更加灵活
+
+```js
+methods: {
+  pushHandler(item) {
+    this.$router.push({
+      name: 'xiangqing',
+      params: {
+        id: item.id,
+        title: item.title,
+      },
+    })
+  },
+  replaceHandler(item) {
+    this.$router.replace({
+      name: 'xiangqing',
+      params: {
+        id: item.id,
+        title: item.title,
+      },
+    })
+  },
+  backHandler() {
+    this.$router.back() // 后退
+  },
+  forwardHandler() {
+    this.$router.forward() // 前进
+  },
+  goHandler() {
+    this.$router.go(-2) // 可前进也可后退
+  },
+},
+```
+
+### 缓存路由组件
+
+作用：让不展示的路由组件保持挂载，不被销毁
+
+```js
+// 缓存单个路由组件
+<keep-alive include="News">
+  <router-view></router-view>
+</keep-alive>
+
+// 缓存多个路由组件
+<keep-alive :include="['News', 'Message']">
+  <router-view></router-view>
+</keep-alive>
+```
+
+### 两个新的生命周期钩子
+
+作用：路由组件所独有的两个钩子，用于捕获路由组件的激活状态
+
+`activated` 路由组件被激活时触发
+
+`deactivated` 路由组件失活时触发
+
+### 路由守卫
+
+作用：对路由进行权限控制
+
+分类：全局守卫、独享守卫、组件内守卫
+
+**全局守卫**
+
+```js
+// 全局前置守卫：初始化时执行、每次路由切换前执行
+router.beforeEach((to, from, next) => {
+  if (to.meta.needAuth) {
+    if (localStorage.getItem('token')) {
+      next()
+    } else {
+      alert('你没有权限')
+    }
+  } else {
+    next()
+  }
+})
+
+// 全局后置守卫：初始化时执行、每次路由切换后执行
+router.afterEach((to) => {
+  document.title = to.meta.title || '我的系统'
+})
+```
+
+**独享守卫**
+
+```js
+{
+  path: 'news',
+  component: News,
+  meta: {
+    needAuth: true,
+    title: '新闻',
+  },
+  beforeEnter(to, from, next) {
+    if (to.meta.needAuth) {
+      if (localStorage.getItem('token')) {
+        next()
+      } else {
+        alert('你没有权限')
+      }
+    } else {
+      next()
+    }
+  },
+},
+```
+
+**组件内守卫**
+
+```js
+beforeRouteEnter(to, from, next) {
+  console.log('beforeRouteEnter')
+  next()
+},
+beforeRouteLeave(to, from, next) {
+  console.log('beforeRouteLeave')
+  next()
+},
+```
+
+### history 模式与 hash 模式
+
+对于一个 url 来说，#及其后面的内容就是 hash 值
+
+hash 值不会包含在 HTTP 请求中，即：hash 值不会带给服务器
+
+**hash 模式**
+
+- 地址中永远带着#号，不美观
+- 若以后将地址通过第三方手机 app 分享，若 app 校验严格，则地址会被标记为不合法
+- 兼容性较好
+
+**history 模式**
+
+- 地址干净，美观
+- 兼容性和 hash 模式相比略差
+- 应用部署上线时需要后端人员支持，解决刷新页面服务端 404 的问题
