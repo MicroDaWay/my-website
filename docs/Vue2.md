@@ -2449,7 +2449,7 @@ h2 {
 
 - 作用：在插入、更新或移除 DOM 元素时，在合适的时候给元素添加样式类名
 
-![[Pasted image 20240102142132.png]]
+![Transition.png](../static/img/Transition.png)
 
 - 写法：
   - 准备好样式
