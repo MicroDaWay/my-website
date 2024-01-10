@@ -25,7 +25,7 @@ export default function Home() {
         <p>全日制本科 数据科学与计算机学院</p>
         <p>通过英语四级、英语六级</p>
         <Line title="专业技能" />
-        <ul className={classes.skills}>
+        <ol className={classes.skills}>
           <li>熟练使用 HTML 和 CSS，理解并掌握盒子模型，熟练使用Flex布局，能够对移动端进行适配</li>
           <li>熟练使用 JavaScript，理解原型、闭包、异步等概念，熟练使用 ES6 语法</li>
           <li>熟练使用 Promise 处理异步逻辑</li>
@@ -40,7 +40,7 @@ export default function Home() {
           <li>了解微信小程序和 uni-app 的开发</li>
           <li>了解 Echarts 数据可视化工具的使用</li>
           <li>了解 Java，了解 Linux 的常用命令，熟悉 MySQL 数据库的常用 SQL 语句</li>
-        </ul>
+        </ol>
         <Line title="项目经历" />
         <h3>后台管理系统</h3>
         <p>从0-1搭建一个后台管理系统，实现一些增删改查的业务，功能类似于 vue-element-admin</p>
