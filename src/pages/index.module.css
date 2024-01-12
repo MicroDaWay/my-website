@@ -4,9 +4,12 @@
   padding: 20px 0;
 }
 
+.age,
+.phone,
 .email,
+.status,
 .website {
-  margin-left: 10px;
+  margin-left: 30px;
 }
 
 .skills {

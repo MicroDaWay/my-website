@@ -6,7 +6,7 @@ sidebar_position: 1
 
 HTML 负责网页的结构
 
-Hyper Text Markup Language（超文本标记语言）
+Hyper Text Markup Language(超文本标记语言)
 
 - 文本：在计算机中使用纯文本编辑器编写的内容被称为文本
   - word 编写的内容不是纯文本，而是富文本
@@ -43,7 +43,7 @@ html
 
 head
 
-- html 的子标签（子元素）
+- html 的子标签(子元素)
 - head 表示网页的头部，可以在 head 中设置网页的各种数据，head 中的内容不会在网页中直接显示
 - meta
   - head 的子元素，用来设置网页的元数据
@@ -53,7 +53,7 @@ head
 
 body
 
-- html 的子标签（子元素）
+- html 的子标签(子元素)
 - 网页中所有可见的内容都应该写在 body 的里边
 
 ## 注释
@@ -77,7 +77,7 @@ body
 
 属性：
 
-- 在开始标签（或自结束标签）中可以为元素设置属性
+- 在开始标签(或自结束标签)中可以为元素设置属性
 - 属性用来描述元素，属性是一个名值对结构，属性名="属性值"
 - 一个元素可以同时指定多个属性，多个属性之间使用空格分离
 - 有些属性，属性名和属性值相同，此时可以省略属性值
@@ -110,7 +110,7 @@ HTML 中不区分大小写，但是建议用小写
 
 ## 常用标签
 
-title 表示标题标签，文字会显示到标签页上，搜索引擎在抓取页面中，会通过 title 的内容来识别网页的主要内容，这部分主要是 SEO 相关的知识（SEO 搜索引擎优化）
+title 表示标题标签，文字会显示到标签页上，搜索引擎在抓取页面中，会通过 title 的内容来识别网页的主要内容，这部分主要是 SEO 相关的知识(SEO 搜索引擎优化)
 
 - p 标签表示一个段落
 - br 表示换行
@@ -172,7 +172,7 @@ title 表示标题标签，文字会显示到标签页上，搜索引擎在抓�
 
 ## 答疑
 
-预格式（保留文本自身的格式）
+预格式(保留文本自身的格式)
 
 - 在网页中，那些需要保留原本格式的内容，需要使用 pre 标签，对于我们来说使用最多的场景就是在网页中编写代码
 - 实际使用过程中，还会结合 code 标签一起使用
@@ -220,7 +220,7 @@ png
 webp
 
 - 是谷歌专门为浏览器推出的一种格式
-- 兼具上述格式所有优点，部分浏览器不支持这种格式（越来越少了）
+- 兼具上述格式所有优点，部分浏览器不支持这种格式(越来越少了)
 
 base64
 
@@ -306,3 +306,300 @@ base64
   </body>
 </html>
 ```
+
+## 内联框架
+
+iframe
+
+- 内联框架，用来向一个网页中引入另一个网页
+- 属性：
+  - src 来指定要引入的网页的路径
+
+**内联框架.html**
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <iframe name="my-website" src="https://microdaway.github.io/" width="500" height="200"></iframe>
+    <hr />
+    <iframe src="./超链接.html" width="500" height="200"></iframe>
+  </body>
+</html>
+```
+
+**超链接.html**
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <a href="https://microdaway.github.io/img/avatar.jpg" target="_parent">头像1</a>
+    <a
+      href="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+      target="my-website"
+      >头像2</a
+    >
+    <a href="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg">头像3</a>
+  </body>
+</html>
+```
+
+## 块元素和行内元素
+
+在 HTML 中，元素可以被分为块元素和行内元素
+
+块元素(block)
+
+- 块元素会独占页面的一行自上向下垂直排列
+- 块元素用来对网页进行布局，将一个页面分成一块一块的
+- 最常用的块元素：div
+
+行内元素(inline)
+
+- 行内元素只会占自身的大小，自左向右水平排列
+- 行内元素一般用来放置文字
+- 最常用的行内元素：span
+
+替换元素
+
+- img、iframe
+
+元素的嵌套规则：
+
+- 块元素中可以放置块元素，也可以放置行内元素
+- 行内元素中尽量不要放置块元素
+- a 元素中可以放置除它自身外的任何元素
+- p 元素中不能放置块元素
+
+注意：浏览器在渲染页面时，会自动修复 HTML 中的语法错误
+
+## CSS 简介
+
+CSS：层叠样式表，通过 CSS 可以为网页中的元素设置各种样式，让页面变得更加漂亮
+
+内联样式(行内样式)：
+
+- 可以直接将 CSS 编写到元素的 style 属性中
+- 一个网页分为三个部分：
+  - 结构、表现和行为
+  - 一个设计优良的网页，最好要把结构、表现和行为三者分离
+- 将样式直接编写到 style 属性中，使得代码变得不容易维护，不推荐使用
+
+内部样式表
+
+- 可以通过 style 标签来创建一个内部样式表
+- 将样式编写到 style 标签中，降低了代码的耦合，使代码易于维护
+- 内部样式表只能在当前页面中生效，无法在不同的页面中进行复用
+
+外部样式表
+
+- 外部样式表，指将样式编写到外部的 CSS 文件中
+- 然后通过 link 标签引入外部的样式
+- 通过外部样式表，将结构和表现完全分离，使代码易于维护
+- 同时代码可以在不同的页面之间进行复用
+- 并且外部文件可以利用到浏览器的缓存机制，加快用户的访问速度
+
+## CSS 基本语法
+
+CSS 注释：/\* 注释 \*/
+
+基本语法：选择器、声明块
+
+选择器：选择器用来指定要设置样式的元素
+
+声明块：
+
+- 声明块用来设置样式
+- 声明块由一对大括号括起来
+- 声明块里边是一个一个的声明
+- 声明是一个名值对：
+  - 一个样式名对应一个(或多个)样式值，之间使用 : 连接使用 ; 结尾
+
+文档：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference
+
+## 基本选择器
+
+元素选择器
+
+- 根据标签名选中多个元素
+- 语法：标签名{}
+- 例子：p{} div{} h1{}
+
+id 选择器
+
+- 根据元素的 id 属性选中一个元素
+- 语法：#id\{ \}
+- 例子：#p1\{ \} #box\{ \} #head\{ \}
+
+类选择器(最常用的选择器)
+
+- 根据元素的 class 属性选中元素
+- 语法：.class\{ \}
+- 例子：.p1\{ \} .box\{ \} .head\{ \}
+
+通配选择器
+
+- 选择页面中的所有元素
+- 语法：\*\{ \}
+
+## 属性选择器
+
+- 用来根据元素的属性来选中元素
+- 语法：
+  - [属性名] 选中具有该属性的元素
+  - [属性名=属性值] 选中指定属性值的元素
+  - [属性名^=属性值] 选中属性值以指定内容开头的元素
+  - [属性名$=属性值] 选中属性值以指定内容结尾的元素
+  - [属性名*=属性值] 选中属性值包含指定内容的元素
+
+可以将多个选择器连着一起写，这样则要求元素必须同时满足多个选择器
+
+交集选择器
+
+- 作用：选中同时符合多个选择器的元素
+- 语法：选择器 1 选择器 2 选择器 3\{ \}
+- 例子：
+  - div[title=hello]\{ \}
+  - div.box\{ \}
+
+CSS 练习：https://flukeout.github.io/
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* [title] {
+        color: red;
+      } */
+
+      /* [title='p1'] {
+        color: red;
+      } */
+
+      /* [title^='p'] {
+        color: red;
+      } */
+
+      /* [title$='1'] {
+        color: red;
+      } */
+
+      /* [title*='p'] {
+        color: red;
+      } */
+
+      div[title='pdd'] {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <p title="p1">p1</p>
+    <p title="p2">p2</p>
+    <div title="div1">div1</div>
+    <div title="div2">div2</div>
+    <div title="pdd">div3</div>
+  </body>
+</html>
+```
+
+## 分组和关系选择器
+
+分组选择器
+
+- 作用：同时选中多个选择器对应的元素
+- 语法：选择器 1,选择器 2,选择器 3,...选择器 n\{ \}
+
+关系选择器
+
+- 根据元素之间的关系来选中元素
+- 元素之间有哪些关系：父子、祖先后代、兄弟
+
+子元素选择器
+
+- 作用：选中指定元素的子元素
+- 语法：父元素 > 子元素\{ \}
+
+后代元素选择器
+
+- 作用：选中指定元素的后代元素
+- 语法：祖先 后代\{ \}
+
+兄弟元素选择器
+
+- 作用：选中指定的兄弟元素
+- 语法：
+  - 兄 + 弟\{ \}
+    - 选中紧随其后的一个兄弟元素
+  - 兄 ~ 弟\{ \}
+    - 选中后边的所有兄弟元素
+
+## 伪类选择器
+
+伪类是一个特殊的类，用来表示元素的状态，伪类使用 : 开头
+
+像超链接，一个链接有没有被访问过就是一种特殊的状态
+
+在 CSS 中，可以使用 :visited 来表示访问过的超链接
+
+a 的伪类：
+
+- :link
+  - 表示正常的超链接(未访问过的超链接)
+- :visited
+  - 访问过的链接
+- :hover
+  - 鼠标移入的元素
+- :active
+  - 鼠标点击的元素
+
+visited 用来表示访问过的链接，它是根据用户的历史记录进行判断，由于隐私的原因，通过 visited 只能改变文字的颜色
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      a:link {
+        color: deepskyblue;
+      }
+
+      a:visited {
+        color: red;
+      }
+
+      a:hover {
+        color: orange;
+      }
+
+      a:active {
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="https://microdaway.github.io/">访问过的</a>
+    <a href="https://microdaway123.github.io/">未访问过的</a>
+  </body>
+</html>
+```
+
+## 结构伪类
