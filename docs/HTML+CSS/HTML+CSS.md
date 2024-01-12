@@ -603,3 +603,372 @@ visited 用来表示访问过的链接，它是根据用户的历史记录进行
 ```
 
 ## 结构伪类
+
+文档：https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
+
+结构伪类：
+
+- :root
+  - 根元素
+- :empty
+  - 空元素
+- :first-child
+  - 第一个子元素
+- :first-of-type
+  - 同类型中的第一个子元素
+- :last-child
+  - 最后一个子元素
+- :last-of-type
+  - 同类型中的最后一个子元素
+- :nth-child
+  - 第 n 个子元素
+  - even 表示偶数，相当于 2n
+  - odd 表示奇数，相当于 2n+1
+- :nth-of-type
+  - 同类型中第 n 个子元素
+- :nth-last-child
+  - 倒数第 n 个元素
+- :nth-last-of-type
+  - 同类型中倒数第 n 个元素
+- :only-child
+  - 唯一的子元素
+- :only-of-type
+  - 同类型中唯一的子元素
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=\, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01,
+      .box02 {
+        width: 100px;
+        height: 100px;
+        border: 2px solid red;
+      }
+
+      div:empty {
+        background-color: #bfa;
+      }
+
+      /* li:first-child {
+        color: orange;
+      } */
+
+      /* li:first-of-type {
+        color: orange;
+      } */
+
+      /* li:last-child {
+        color: orange;
+      } */
+
+      /* li:last-of-type {
+        color: orange;
+      } */
+
+      /* li:nth-child(2n) {
+        color: orange;
+      } */
+
+      /* li:nth-of-type(1) {
+        color: orange;
+      } */
+
+      /* li:only-child {
+        color: orange;
+      } */
+
+      li:only-of-type {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <p>hello</p>
+    <li>body中的li</li>
+    <div class="box01">box01</div>
+    <hr />
+    <div class="box02"></div>
+
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+    </ul>
+
+    <ul>
+      <li>我是唯一的li</li>
+    </ul>
+  </body>
+</html>
+```
+
+## 否定伪类
+
+:not
+
+- 否定伪类，除了某些元素
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* p:not(:nth-child(3)) {
+        color: tomato;
+      } */
+
+      p:not(.p1) {
+        color: tomato;
+      }
+    </style>
+  </head>
+  <body>
+    <p>锄禾日当午</p>
+    <p>汗滴禾下土</p>
+    <p class="p1">谁知盘中餐</p>
+    <p>粒粒皆辛苦</p>
+  </body>
+</html>
+```
+
+## 伪元素
+
+伪元素表示的是页面中特殊的位置
+
+伪元素使用::开头
+
+- `::before`
+  - 元素的开始位置(开始标签之后)
+- `::after`
+  - 元素的结束位置(结束标签之前)
+- `::first-letter`
+  - 首字母
+- `::first-line`
+  - 第一行
+- `::selection`
+  - 选中的文字的样式
+
+通过 before、after 可以选中元素开始或结束的位置，从而为其添加内容
+
+注意：这里的内容是通过 CSS 添加的！不算是网页中的正式内容
+
+通过它可以为元素添加一些统一的符号
+
+也可以在特殊场景下通过它们来调整一下页面的样式
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      div::before {
+        content: 'before';
+        color: red;
+      }
+
+      div::after {
+        content: 'after';
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div>我是一个div</div>
+  </body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      p::first-letter {
+        font-size: 30px;
+        color: red;
+      }
+
+      p::first-line {
+        background-color: orange;
+      }
+
+      p::selection {
+        color: deepskyblue;
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam, dolorem assumenda. Aliquid
+      adipisci, aperiam, modi eius quidem, harum officiis vitae sit laboriosam iste officia omnis
+      voluptatibus impedit nulla inventore error!
+    </p>
+  </body>
+</html>
+```
+
+## 样式的继承
+
+设置给祖先元素的样式，也会同时应用到其后代元素上
+
+继承的存在大大的简化了样式的编写
+
+但并不是所有的样式都会发生继承！
+
+所有的布局、背景、边框等相关的样式都不会发生继承
+
+## 选择器的权重
+
+样式的冲突
+
+当我们使用不同的选择器，选中同一个元素并设置相同的样式时，就发生了样式的冲突
+
+当样式冲突发生时，哪个样式生效由选择器的优先级(权重)决定：
+
+- 继承的样式：没有优先级
+- 通配选择器: 0,0,0,0
+- 元素和伪元素选择器：0,0,0,1
+- 类和伪类选择器：0,0,1,0
+- id 选择器：0,1,0,0
+- 内联样式：1,0,0,0
+
+比较优先级时，需要将多个选择器的优先级一起计算
+
+优先级高的优先显示，优先级的累加无法跨越数量级
+
+如果优先级一样，则优先显示靠下的样式
+
+如果为样式添加 !important，则该样式会获得最高的优先级，优先于其他样式显示，慎用！
+
+注意：分组选择器优先级都是单独计算的！
+
+## 长度单位
+
+像素（px）：
+
+- 显示器的图形实际上是由一个一个的小点点构成的，每一个小点就是一个像素
+- 每一台设备的像素大小是不同的，越清晰的设备像素就越小
+- 当我们面向移动端开发时，会面临一个问题，同样是 12px，在 pc 端里可能正合适，但是在手机中浏览时，就会变得特别的小
+
+百分比（%）：
+
+- 设置后元素的属性会根据父元素指定属性的百分比计算
+
+em：
+
+- 1em = 1font-size（参照当前元素的字体大小）
+
+rem（root em）：
+
+- 1rem = 1 根元素的 font-size（参照 html 根元素的字体大小）
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+      }
+
+      .box02 {
+        font-size: 100px;
+        width: 1em;
+        height: 1em;
+        background-color: #bfa;
+      }
+
+      html {
+        font-size: 150px;
+      }
+
+      .box03 {
+        width: 1rem;
+        height: 1rem;
+        background-color: brown;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+
+    <div class="box03"></div>
+  </body>
+</html>
+```
+
+## 颜色单位
+
+颜色名
+
+- 可以直接使用颜色名来设置颜色
+- 比如：red、blue、green、yellow、orange...
+
+rgb 值
+
+- rgb 值指通过三种不同的颜色的组合，来调配出不同的颜色
+- red green blue
+- 语法：RGB(红色, 绿色, 蓝色)
+- 取值范围：0-255
+
+rgba()
+
+- r 红色
+- g 绿色
+- b 蓝色
+- a 不透明度，需要一个 0-1 之间的值
+
+hsl() 也是设置颜色的方式
+
+- h 色相 0 - 360
+- s 饱和度 0% - 100%
+- l 亮度 0% - 100%
+
+hsla()
+
+- a 不透明度，需要一个 0-1 之间的值
+
+## 十六进制颜色
+
+使用十六进制来表示颜色：
+
+- 十进制 0 1 2 3 4 5 6 7 8 9 10
+- 二进制 0 1 10 11 100 101 110 111
+- 八进制 0 1 2 3 4 5 6 7 10 11 12 ... 17 20
+- 十六进制 0 1 2 3 4 5 6 7 8 9 a b c d e f
+
+可以通过三个两位的十六进制数字来表示一个颜色
+
+- 语法：#红色绿色蓝色
+- 每一个颜色的取值范围 00 - ff
+- 例子：
+  - 红色：#ff0000
+  - 绿色：#00ff00
+- 如果 rgb 值是两两重复的，可以进行简写
+  - #aabbcc -> #abc
+  - #bbffaa -> #bfa
+
+## 盒子模型简介

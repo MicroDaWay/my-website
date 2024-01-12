@@ -18,9 +18,7 @@ export default function Home() {
           <span className={classes.status}>求职状态：随时入职</span>
           <span className={classes.website}>
             个人网站：
-            <a href="https://microdaway.github.io" target="_blank">
-              https://microdaway.github.io
-            </a>
+            <a href="https://microdaway.github.io">https://microdaway.github.io</a>
           </span>
         </p>
         <Line title="教育经历" />
@@ -66,6 +64,16 @@ export default function Home() {
         <p>项目难点：对订单状态的管理、以及对用户权限的管理</p>
         <p>
           项目收获：对项目的开发流程，前后端的分工职责有了更深的理解，学会了将图片上传到阿里云的对象存储中
+        </p>
+        <p>
+          项目仓库地址：
+          <a href="https://github.com/MicroDaWay/xypt" target="_blank">
+            https://github.com/MicroDaWay/xypt
+          </a>
+          ，
+          <a href="https://github.com/MicroDaWay/xypt-web" target="_blank">
+            https://github.com/MicroDaWay/xypt-web
+          </a>
         </p>
       </div>
     </Layout>
