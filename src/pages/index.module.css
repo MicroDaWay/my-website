@@ -4,14 +4,18 @@
   padding: 20px 0;
 }
 
-.age,
-.phone,
-.email,
-.status,
-.website {
-  margin-left: 30px;
+.introduce {
+  display: flex;
 }
 
-.skills {
-  padding-left: 16px;
+.right {
+  margin-left: 100px;
+}
+
+.item {
+  font-weight: bold;
+}
+
+.content {
+  margin-left: 70px;
 }
