@@ -860,23 +860,23 @@ visited 用来表示访问过的链接，它是根据用户的历史记录进行
 
 ## 长度单位
 
-像素（px）：
+像素(px)：
 
 - 显示器的图形实际上是由一个一个的小点点构成的，每一个小点就是一个像素
 - 每一台设备的像素大小是不同的，越清晰的设备像素就越小
 - 当我们面向移动端开发时，会面临一个问题，同样是 12px，在 pc 端里可能正合适，但是在手机中浏览时，就会变得特别的小
 
-百分比（%）：
+百分比(%)：
 
 - 设置后元素的属性会根据父元素指定属性的百分比计算
 
 em：
 
-- 1em = 1font-size（参照当前元素的字体大小）
+- 1em = 1font-size(参照当前元素的字体大小)
 
-rem（root em）：
+rem(root em)：
 
-- 1rem = 1 根元素的 font-size（参照 html 根元素的字体大小）
+- 1rem = 1 根元素的 font-size(参照 html 根元素的字体大小)
 
 ```html
 <!DOCTYPE html>
@@ -973,7 +973,7 @@ hsla()
 
 ## 盒子模型简介
 
-盒子模型（box model）
+盒子模型(box model)
 
 网页的布局指就是将元素摆放到网页的不同的位置
 
@@ -981,17 +981,17 @@ hsla()
 
 在网页中每一个元素都是一个矩形，或者可以直接将其想象为是一个盒子，每一个盒子，都由以下几个部分组成：
 
-- 内容区（content）
+- 内容区(content)
   - 内容区在元素最内部，用来容纳子元素
   - 内容区的大小由 width 和 height 设置
-- 内边距（padding）
+- 内边距(padding)
   - 内容区和边框之间的距离称为内边距
-- 边框（border）
+- 边框(border)
   - 边框是盒子边界，离开边框就属于盒子的外部了
   - 边框会影响到盒子可见框的大小
-- 外边距（margin）
+- 外边距(margin)
   - 盒子与盒子之间的距离称为外边距
-  - 外边距不会影响盒子的大小，但是它会影响盒子的位置（实际大小）
+  - 外边距不会影响盒子的大小，但是它会影响盒子的位置(实际大小)
 
 设置边框：
 
@@ -1069,7 +1069,7 @@ box-sizing 用来指定盒子可见框的计算方式，可选值：
 
 垂直方向的相邻外边距会发生外边距折叠的现象
 
-兄弟元素间外边距会取较大值（这样设计是为了避免两个元素之间的距离过远）
+兄弟元素间外边距会取较大值(这样设计是为了避免两个元素之间的距离过远)
 
 父子元素间子元素外边距会传递给父元素，这样会导致布局出问题，需要避免该问题
 
@@ -1201,7 +1201,7 @@ box-sizing 用来指定盒子可见框的计算方式，可选值：
 
 ## overflow
 
-当子元素大小超过父元素内容区时，子元素会从父元素中溢出（overflow）
+当子元素大小超过父元素内容区时，子元素会从父元素中溢出(overflow)
 
 在 css 中通过 overflow 这个样式，来处理溢出内容
 
@@ -1332,7 +1332,7 @@ line-height 用来设置元素的行高
 
 当我们设置元素的 font-size 时，实际上就是在设置文本框的大小
 
-在文本框存在一个位置叫做基线（baseline）
+在文本框存在一个位置叫做基线(baseline)
 
 文字的垂直对齐：默认每个文字和父元素在垂直方向都是沿着基线对齐的
 
@@ -1456,11 +1456,11 @@ font
 
 如果这些小图标，可以任意缩放，同时又可以任意的修改颜色，那就好了！
 
-在网页中文字可以任意缩放和改变颜色！（文字是矢量图）
+在网页中文字可以任意缩放和改变颜色！(文字是矢量图)
 
 如果我们的小图标能够像文字一样，那就好了！
 
-图标字体（iconfont）
+图标字体(iconfont)
 
 - 所谓的图标字体，指将小图标制作为字体文件
 - 可以使用一些第三方的库
@@ -1532,6 +1532,478 @@ box-shadow
   <body>
     <div class="box01"></div>
     <!-- <div class="box02"></div> -->
+  </body>
+</html>
+```
+
+## 文档流
+
+文档流（normal flow） 正常布局流
+
+- https://developer.mozilla.org/zh-CN/docs/Learn/CSS/CSS_layout/Normal_Flow
+- 文档流是网页中的位置，我们所创建的元素默认都存在于文档流中
+- 文档流中的元素，必须要遵循文档流的规则在页面中排列
+- 块元素
+  - 块元素在文档流中自上向下垂直排列
+  - 块元素的默认宽度会将父元素撑满（默认值为 auto）
+  - 块元素的默认高度被内容撑开
+- 行内元素
+  - 行内元素在文档流中会自左向右水平排列，如果一行不足以容纳所有元素
+  - 则会另起一行继续自左向右水平排列（和我们日常的书写相同）
+  - 行内元素的默认宽度和高度都被内容撑开
+
+## 包含块(containing block)
+
+在文档流中，包含块就是离当前元素最近的祖先块元素
+
+## 水平布局的等式
+
+子元素会在父元素内容区中排列
+
+在文档流中，块元素的水平排列，必须要遵循如下一个等式：
+
+- 子元素可见框宽度 + 子元素的水平外边距 = 包含块内容区的宽度
+- margin-left + 可见框 + margin-right = 包含块内容区的宽度
+- 当所有的属性值中没有 auto，此时浏览器会自动调整右外边距以使等式强制满足
+- 当只有一个属性值设置为 auto，则浏览器会自动调整该值以使等式满足
+- 当左右外边距为 auto，而 width 有值时，则左右外边距会设置为相等的值，以使等式满足
+- 当外边距和 width 同时设置为 auto，则设置 auto 的外边距就是 0
+
+在文档流中，块元素的垂直排列，不需要遵循等式！
+
+## 浮动的简介
+
+浮动是一种传统的网页的布局方式
+
+通过浮动可以使得元素脱离文档流而横向排列
+
+float
+
+- 设置元素浮动
+- 可选值：
+  - none，默认值 元素不浮动
+  - left，向左浮动
+  - right，向右浮动
+- 浮动的特点：
+  - 设置浮动后，元素会脱离文档流，其后的元素会自动上移
+  - 设置浮动后，元素会向其包含块的左侧或右侧移动
+  - 如果一行之内无法容纳所有的浮动元素，则后边的元素会自动换到下一行
+  - 浮动元素不会超过它上边浮动的兄弟元素，最多一边齐
+  - 浮动元素不会盖住文字，文字会环绕在浮动元素的周围
+
+## 浮动的特点
+
+浮动后，之前的布局等式就失效了
+
+元素脱离文档流后的特点：
+
+- 块元素：
+  - 块元素不再独占一行，而是水平排列
+  - 宽度和高度都被内容撑开
+- 行内元素：
+  - 设置浮动后行内元素可以设置宽度和高度
+
+总结：脱离文档流后，块元素不再独占一行，宽高被内容撑开，行内元素变成块元素
+
+脱离文档流后，就不再需要区分行内元素和块元素
+
+## 高度塌陷问题
+
+在文档流中的元素，可以将其他元素的高度撑开！
+
+当元素浮动，它会脱离文档流，脱离文档流后，无法撑开父元素的高度，导致父元素高度塌陷
+
+父元素高度塌陷，其后的元素会自动上移，导致布局变得混乱
+
+高度塌陷是我们使用浮动布局时必须要解决的问题！
+
+如何解决该问题？
+
+- 可以直接将父元素的高度写死
+  - 这样一来父元素高度写死，无法根据子元素高度的变化而变化
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        border: 5px solid red;
+      }
+
+      .box02 {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      .box03 {
+        width: 200px;
+        height: 200px;
+        background-color: skyblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+    <div class="box03"></div>
+  </body>
+</html>
+```
+
+## BFC(Block Formatting Context)
+
+- 块级格式化环境
+- https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+- 可以将 BFC 理解为一个隐藏的属性，当开启 BFC 后元素会具备如下的特征：
+
+  - 开启 BFC 后，子元素的垂直外边距不会传递给父元素
+  - 开启 BFC 后，元素不会被浮动元素所覆盖
+  - 开启 BFC 后，元素可以包含浮动的子元素
+
+- 如何开启 BFC：
+  - 需要用一些其他的样式来间接的开启 BFC
+  - 由于 BFC 是通过一些样式间接开启的，所以都会有一些副作用
+  - 而我们要做的是找到一种可以开启 BFC，同时副作用又比较小的
+- 例如：
+  - 浮动会开启元素的 BFC
+  - 将 overflow 设置为一个非 visible 的值
+  - display: flow-root
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        /* float: left; */
+        /* overflow: hidden; */
+        display: flow-root;
+        border: 5px solid red;
+      }
+
+      .box02 {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      .box03 {
+        width: 300px;
+        height: 300px;
+        background-color: skyblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+    <div class="box03"></div>
+  </body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: skyblue;
+        display: flow-root;
+      }
+
+      .box02 {
+        width: 100px;
+        height: 100px;
+        background-color: orange;
+        margin-top: 50px;
+      }
+
+      .box03 {
+        float: left;
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+      }
+
+      .box04 {
+        display: flow-root;
+        width: 200px;
+        height: 200px;
+        background-color: brown;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+
+    <div class="box03"></div>
+    <div class="box04"></div>
+  </body>
+</html>
+```
+
+## clear
+
+- 清除浮动元素对当前元素所产生的影响
+- 可选值：
+  - left 清除左侧浮动元素对当前元素的影响
+  - right 清除右侧浮动元素对当前元素的影响
+  - both 清除最大一侧浮动元素对当前元素的影响
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: skyblue;
+      }
+
+      .box02 {
+        float: right;
+        width: 300px;
+        height: 300px;
+        background-color: orange;
+      }
+
+      .box03 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        clear: both;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box02"></div>
+    <div class="box03"></div>
+  </body>
+</html>
+```
+
+## clearfix
+
+解决高度塌陷问题
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        border: 5px solid red;
+      }
+
+      .box02 {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      .clearfix::after {
+        display: block;
+        content: '';
+        clear: both;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01 clearfix">
+      <div class="box02"></div>
+    </div>
+  </body>
+</html>
+```
+
+解决高度塌陷和外边距折叠问题
+
+```css
+.clearfix::before,
+.clearfix::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+```
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        border: 5px solid red;
+      }
+
+      .box02 {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      /* .clearfix::after {
+        display: block;
+        content: '';
+        clear: both;
+      } */
+
+      .box03 {
+        width: 200px;
+        height: 200px;
+        background-color: dodgerblue;
+      }
+
+      /* .box03::before {
+        content: '';
+        display: table;
+      } */
+
+      .box04 {
+        width: 100px;
+        height: 100px;
+        background-color: brown;
+        margin-top: 50px;
+      }
+
+      .clearfix::before,
+      .clearfix::after {
+        content: '';
+        display: table;
+        clear: both;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01 clearfix">
+      <div class="box02"></div>
+    </div>
+
+    <div class="box03 clearfix">
+      <div class="box04"></div>
+    </div>
+  </body>
+</html>
+```
+
+## 相对定位
+
+布局手段：
+
+- 盒子模型（纵向）
+- 浮动（横向）
+- 定位
+
+定位（position）
+
+- 通过定位可以将一个元素摆放到页面中的任意位置
+- CSS 中共有四种定位方式：
+  - 相对定位
+  - 绝对定位
+  - 固定定位
+  - 粘滞定位
+
+position
+
+- 用来设置元素的定位方式
+- 可选值：
+  - static，默认值，元素没有开启定位
+  - relative，开启元素的相对定位
+  - absolute，开启元素的绝对定位
+  - fixed，开启元素的固定定位
+  - sticky，开启粘滞定位
+
+相对定位：
+
+- 将元素的 position 属性设置为 relative 则开启了元素的相对定位
+- 相对定位的特点：
+  - 开启相对定位而不设置元素的偏移量，此时元素不会发生任何变化
+  - 开启相对定位不会使得元素脱离文档流，不会改变元素的性质
+  - 相对定位元素是参照于其原来的位置进行定位的
+  - 相对定位会提升元素的层级
+
+偏移量
+
+- 开启了定位的元素可以通过偏移量来设置元素的位置
+- 偏移量一共有四个：
+  - top
+    - 元素上边距离定位位置上边的距离
+  - bottom
+    - 元素下边距离定位位置下边的距离
+  - left
+    - 元素左边距离定位位置左边的距离
+  - right
+    - 元素右边距离定位位置右边的距离
+- 偏移量通常只使用两个即可定位一个元素的位置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      .box02 {
+        position: relative;
+        top: 50px;
+        left: 50px;
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+      }
+
+      .box03 {
+        width: 200px;
+        height: 200px;
+        background-color: tomato;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box02"></div>
+    <div class="box03"></div>
   </body>
 </html>
 ```

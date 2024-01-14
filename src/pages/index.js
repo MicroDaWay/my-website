@@ -31,8 +31,8 @@ export default function Home() {
           <li>熟练掌握 HTML+CSS，熟练掌握弹性布局，能够快速实现Web端和移动端页面搭建</li>
           <li>熟练掌握 JavaScript，理解原型，闭包，异步等概念，熟练掌握 ES6+ 语法</li>
           <li>
-            熟悉 Node.js 和常用模块，在此基础上能够使用 Express 等 Web
-            框架进行简单的服务器应用程序开发
+            熟悉 Node.js 和常用模块，在此基础上能够使用 Express
+            等Web框架进行简单的服务器应用程序开发
           </li>
           <li>熟练掌握 axios，fetch 发送网络请求，熟练掌握 Promise 处理异步逻辑</li>
           <li>熟悉 git 常用命令，能够使用 git 进行版本控制</li>
@@ -47,8 +47,7 @@ export default function Home() {
         </p>
         <p>
           <span className={classes.item}>项目描述：</span>
-          该项目是一个后台管理系统，主要用于公司统一管理企业员工，提高管理效率，为企业提供一站
-          式的解决方案，项目包含登录，主页，公司架构，公司角色，权限设计等模块
+          该项目是一个后台管理系统，主要用于公司统一管理企业员工，提高管理效率，为企业提供一站式的解决方案，项目包含登录，主页，公司架构，公司角色，权限设计等模块
         </p>
         <p>
           <span className={classes.item}>技术选型：</span>Vue3、TypeScript、Vite、Element
@@ -61,11 +60,10 @@ export default function Home() {
               axios 的二次封装，请求拦截器携带 token，响应拦截器简化数据并对请求错误弹出错误信息
             </li>
             <li>
-              Pinia 集中状态管理，多个组件共享数据和方法，对用户 token 使用 localStorage 本地化存 储
+              Pinia 集中状态管理，多个组件共享数据和方法，对用户 token 使用 localStorage 本地化存储
             </li>
             <li>
-              划分不同等级的用户，不同等级的用户在登录系统后有不同的路由权限，根据后端的返回数
-              据在前端实现权限管理，如动态路由、权限按钮
+              划分不同等级的用户，不同等级的用户在登录系统后有不同的路由权限，根据后端的返回数据在前端实现权限管理，如动态路由、权限按钮
             </li>
             <li>统一封装处理各个页面逻辑，如增删改查、工具函数、自定义校验、处理时间格式</li>
             <li>⽤Echarts做数据可视化展示</li>
@@ -82,35 +80,59 @@ export default function Home() {
         </p>
         <p>
           <span className={classes.item}>项目收获：</span>
-          通过该项⽬的开发，对搭建整个脚⼿架，理解这种基于⾓⾊的权限控制访问（理解后台系统权限并实现），对全局组件封装提⾼开发效率有⼀定理解
+          通过该项目的开发，对搭建整个脚手架，理解这种基于角色的权限控制访问(理解后台系统权限并实现)，对全局组件封装提高开发效率有⼀定理解
         </p>
-        <h3>基于Vue3的移动端购物网站</h3>
-        <p>项目描述：该项目是一个移动端购物网站，实现移动端的购物网站，进行移动端适配</p>
-        <p>主要功能：商品浏览、商品搜索、购物车管理、下单支付、用户评价等</p>
-        <p>技术选型：Vue3、TypeScript、Vite、Element Plus、Pinia、Vue Router</p>
+        <br />
+
         <p>
-          项目收获：通过该项目的开发，学会通过使用 vueuse
-          工具库来快速实现一些功能，对项目的开发流程更加熟悉
-        </p>
-        <h3>基于Vue3的校园跑腿微信小程序</h3>
-        <p>项目描述：这是一个使用uni-app开发的微信小程序，这是一个全栈项目</p>
-        <p>
-          主要功能描述：普通用户可以下订单，骑手可以接单，普通用户可以申请成为骑手，管理员需要审核才能让普通用户成为骑手，以及对用户页面和按钮级权限的控制
-        </p>
-        <p>技术选型：Vue3、TypeScript、Pinia、uni-app、Java、Spring Boot3、MySQL</p>
-        <p>项目难点：对订单状态的管理、以及对用户权限的管理</p>
-        <p>
-          项目收获：对项目的开发流程，前后端的分工职责有了更深的理解，学会了将图片上传到阿里云的对象存储中
+          <span className={classes.item}>个人项目</span>
         </p>
         <p>
-          项目仓库地址：
-          <a href="https://github.com/MicroDaWay/xypt" target="_blank">
-            https://github.com/MicroDaWay/xypt
-          </a>
-          ，
-          <a href="https://github.com/MicroDaWay/xypt-web" target="_blank">
-            https://github.com/MicroDaWay/xypt-web
-          </a>
+          <span className={classes.item}>项目名称：</span>校园跑腿微信小程序
+        </p>
+        <p>
+          <span className={classes.item}>项目描述：</span>
+          这是一个使用uni-app开发的校园跑腿微信小程序，使用Vue3构建前端页面，后端采用Java、Spring
+          Boot3、MySQL数据库开发项目接口
+        </p>
+        <p>
+          <span className={classes.item}>主要功能描述：</span>
+          普通用户可以下订单，骑手可以接单，普通用户可以申请成为骑手，管理员需要审核才能让普通用户成为骑手，以及对用户页面和按钮级权限的控制
+        </p>
+        <p>
+          <span className={classes.item}>技术选型：</span>
+          Vue3、TypeScript、Pinia、uni-app、Java、Spring Boot3、MySQL
+        </p>
+        <p>
+          <span className={classes.item}>项目难点：</span>
+          <ol className={classes.content}>
+            <li>用户下单、跑腿接单业务的梳理与设计</li>
+            <li>对用户权限的设计</li>
+            <li>订单表设计，下单流程开发</li>
+            <li>通用组件封装提高开发效率</li>
+            <li>后端编码，权限设计与实现，MySQL数据库使用、异常处理、响应数据封装、token生成</li>
+          </ol>
+        </p>
+        <p>
+          <span className={classes.item}>项目收获：</span>
+          通过该项⽬的开发，理解前后端分离的概念和开发模式，明⽩了架构设计以及开发⼈员开发规范的重要性。对Vue3
+          Componsition
+          API的使⽤熟练和理解，后端框架理解，后端数据库的设计，token鉴权理解、文件上传理解、理解后端业务设计
+        </p>
+        <p>
+          <span className={classes.item}>项目仓库地址：</span>
+          <ul className={classes.repository}>
+            <li>
+              后端代码：
+              <a href="https://github.com/MicroDaWay/xypt">https://github.com/MicroDaWay/xypt</a>
+            </li>
+            <li>
+              前端代码：
+              <a href="https://github.com/MicroDaWay/xypt-web">
+                https://github.com/MicroDaWay/xypt-web
+              </a>
+            </li>
+          </ul>
         </p>
       </div>
     </Layout>

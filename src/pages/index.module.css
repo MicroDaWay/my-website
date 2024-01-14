@@ -19,3 +19,8 @@
 .content {
   margin-left: 70px;
 }
+
+.repository {
+  margin-left: 80px;
+  list-style: none;
+}
