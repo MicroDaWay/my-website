@@ -1538,18 +1538,18 @@ box-shadow
 
 ## 文档流
 
-文档流（normal flow） 正常布局流
+文档流(normal flow) 正常布局流
 
 - https://developer.mozilla.org/zh-CN/docs/Learn/CSS/CSS_layout/Normal_Flow
 - 文档流是网页中的位置，我们所创建的元素默认都存在于文档流中
 - 文档流中的元素，必须要遵循文档流的规则在页面中排列
 - 块元素
   - 块元素在文档流中自上向下垂直排列
-  - 块元素的默认宽度会将父元素撑满（默认值为 auto）
+  - 块元素的默认宽度会将父元素撑满(默认值为 auto)
   - 块元素的默认高度被内容撑开
 - 行内元素
   - 行内元素在文档流中会自左向右水平排列，如果一行不足以容纳所有元素
-  - 则会另起一行继续自左向右水平排列（和我们日常的书写相同）
+  - 则会另起一行继续自左向右水平排列(和我们日常的书写相同)
   - 行内元素的默认宽度和高度都被内容撑开
 
 ## 包含块(containing block)
@@ -1924,11 +1924,11 @@ float
 
 布局手段：
 
-- 盒子模型（纵向）
-- 浮动（横向）
+- 盒子模型(纵向)
+- 浮动(横向)
 - 定位
 
-定位（position）
+定位(position)
 
 - 通过定位可以将一个元素摆放到页面中的任意位置
 - CSS 中共有四种定位方式：
@@ -2007,3 +2007,509 @@ position
   </body>
 </html>
 ```
+
+## 绝对定位
+
+- 将元素的 position 设置为 absolute，则开启了元素的绝对定位
+- 特点：
+  - 开启绝对定位后，如果不设置偏移量，元素的位置不会发生变化
+  - 开启绝对定位后，元素会脱离文档流，同时元素性质发生变化
+  - 绝对定位元素是参照于离它最近的开启了定位的祖先元素进行定位
+  - 如果所有的祖先元素都没有开启定位，则相对于浏览器窗口进行定位
+  - 所以在开发中，经常在为一个元素开启绝对定位后，同时也给它的父元素开启相对定位
+  - 绝对定位会提升元素的层级
+
+**绝对定位是参照于它的包含块进行定位的**
+
+绝对定位元素的包含块是谁
+
+- 绝对定位元素的包含块是离它最近的开启了定位的祖先元素
+- 如果所有的祖先都没有开启定位，则它的包含块是初始包含块
+- 初始包含块的大小和视口是相同的
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      .box02 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+      }
+
+      .box03 {
+        width: 200px;
+        height: 200px;
+        background-color: tomato;
+      }
+
+      .box04 {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        background-color: deepskyblue;
+      }
+
+      .box05 {
+        /* position: relative; */
+        width: 300px;
+        height: 300px;
+        background-color: brown;
+        margin-left: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box04">
+      <div class="box05">
+        <div class="box02"></div>
+      </div>
+    </div>
+    <div class="box03"></div>
+  </body>
+</html>
+```
+
+## 垂直水平居中
+
+盒子模型的等式
+
+- margin-left + 可见框宽度 + margin-right = 包含块的内容区宽度
+
+当元素开启了绝对定位后，两个新的等式诞生了！
+
+- left + margin-left + 可见框宽度 + margin-right + right = 包含块的内容区宽度
+- top + margin-top + 可见框高度 + margin-bottom + bottom = 包含块的内容区高度
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        position: relative;
+        width: 800px;
+        height: 400px;
+        border: 5px solid red;
+      }
+
+      .box02 {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+  </body>
+</html>
+```
+
+## z-index
+
+开启了定位后，可以通过 z-index 来设置元素的层级
+
+z-index 的值越大，元素的层级就越高，层级越高越优先显示
+
+如果层级一样，则优先显示下边的元素
+
+z-index 可以设置为负值，设置负值后定位元素将会被文档流中的元素覆盖！
+
+注意：祖先元素的层级再高，也无法盖住后代元素
+
+## 固定定位
+
+将 position 设置为 fixed 则开启了元素的固定定位
+
+固定定位也是一种绝对定位，它的大部分的特点和绝对定位是相同的
+
+不同点在于固定定位总是参照于浏览器的窗口进行定位
+
+一旦定位，不会随窗口进行滚动
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        height: 2000px;
+      }
+
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+
+      .box02 {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+      }
+
+      .box03 {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        width: 200px;
+        height: 200px;
+        background-color: deepskyblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box02"></div>
+    <div class="box03"></div>
+  </body>
+</html>
+```
+
+## 粘滞定位
+
+将元素的 position 设置为 sticky 则开启了元素的粘滞定位，粘滞定位的特点和相对定位类似
+
+定位参照物：粘滞定位相对于离它最近的拥有滚动条的祖先元素来定位
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        height: 2000px;
+      }
+
+      .box01 {
+        position: sticky;
+        top: 50px;
+        width: 1000px;
+        height: 200px;
+        background-color: orange;
+        margin: 100px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <p>
+      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nihil, accusantium. Necessitatibus
+      soluta doloremque fugiat aspernatur distinctio excepturi expedita, magni nobis, vel vitae
+      neque facere voluptas a id culpa consequuntur corporis.
+    </p>
+    <p>
+      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eius sint dolor, ad, commodi
+      consequuntur harum quidem, modi impedit quisquam saepe similique labore dolorum nemo aut!
+      Obcaecati alias labore vitae sint.
+    </p>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae cumque distinctio consectetur,
+      nulla dolorem error sunt ullam placeat ratione ad incidunt esse ipsa, enim, facilis nam eum
+      repellendus quia laborum.
+    </p>
+  </body>
+</html>
+```
+
+## 布局方法总结
+
+传统的布局手段
+
+盒子模型(box model)
+
+- 盒子模型主要用来确定元素的大小和间距的
+- 主要用来处理元素的纵向排列
+
+浮动(float)
+
+- 浮动本来是用来处理文本环绕图片这种类似效果的，后来被用到了元素的水平排列上
+- 因为它不是被设计用来布局的，所以使用浮动时会存在一些问题(高度塌陷问题)
+- 主要用来处理元素的横向排列
+- 注意：盒子模型和浮动主要用来进行宏观的布局
+
+定位(position)
+
+- 通过定位可以将一个元素摆放到网页的任意位置
+- 主要用来处理网页中的小东西
+
+## 定位的总结
+
+相对定位
+
+- 不脱离文档流
+- 相对定位参照于元素在文档流中的位置进行定位
+- 相对定位更多的是配合绝对定位来使用
+
+绝对定位
+
+- 脱离文档流
+- 绝对定位元素是参照于它的包含块来定位的
+- 在网页中定位的主要手段就是绝对定位
+
+固定定位
+
+- 脱离文档流
+
+offset（偏移量）
+
+- 四个偏移量，可以有四种组合方式
+- top left 通过左上角定位
+- top right 通过右上角定位
+- bottom left 通过左下角定位
+- bottom right 通过右下角定位
+
+## 弹性盒简介
+
+弹性盒是 CSS3 中新添加的布局方式，通过它可以更加方便的完成我们对网页的布局
+
+通过弹性盒模型，可以便捷的完成网页中的各种布局
+
+弹性容器
+
+- 要使用弹性盒必须先将元素设置为弹性容器
+- display: flex 块级弹性容器
+- display: inline-flex 行内弹性容器
+
+弹性子元素（弹性项）
+
+- 弹性容器的子元素都会自动变成弹性子元素
+- 弹性子元素都会沿着弹性容器的主轴排列
+
+主轴
+
+- 主轴就是弹性子元素的排列方向
+
+侧轴（辅轴）
+
+- 侧轴是与主轴垂直方向的轴
+
+## 主轴和侧重的设置
+
+主轴
+
+- 主轴就是弹性子元素排列方向
+- 如何设置主轴方向：
+  - flex-direction
+    - 可选值：
+      - row 主轴是自左向右水平排列
+      - column 主轴是自上向下垂直排列
+      - row-reverse 主轴是自右向左水平排列
+      - column-reverse 主轴是自下向上垂直排列
+- 设置元素是否换行
+  - flex-wrap
+    - 可选值：
+      - nowrap 元素不会自动换行
+      - wrap 自动换行
+      - wrap-reverse 反向换行
+- flex-flow：
+  - flex-direction 和 flex-wrap 的简写属性
+  - 可以同时设置两个样式并且没有顺序和数量的要求
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        /* box-sizing: border-box; */
+      }
+
+      ul {
+        display: flex;
+        /* flex-direction: row;
+        flex-wrap: wrap; */
+        flex-flow: row wrap;
+
+        width: 300px;
+        border: 5px solid red;
+        list-style: none;
+      }
+
+      li {
+        flex-shrink: 0;
+        line-height: 100px;
+        text-align: center;
+      }
+
+      li:first-child {
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+      }
+
+      li:nth-child(2) {
+        width: 100px;
+        height: 100px;
+        background-color: orange;
+      }
+
+      li:nth-child(3) {
+        width: 100px;
+        height: 100px;
+        background-color: yellowgreen;
+      }
+
+      li:nth-child(4) {
+        width: 100px;
+        height: 100px;
+        background-color: skyblue;
+      }
+
+      li:nth-child(5) {
+        width: 100px;
+        height: 100px;
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+    </ul>
+  </body>
+</html>
+```
+
+## 主轴和侧轴的对齐方式
+
+justify-content
+
+- 设置元素在主轴上的对齐方式
+- 可选值：
+  - start 默认值，元素靠主轴起始位置对齐
+  - end 元素靠主轴的结束位置对齐
+  - center 沿主轴方向居中对齐
+  - space-between 将主轴方向空白位置分配到两个元素之间
+  - space-around 将主轴方向空白位置分配到元素周围
+  - space-evenly 将主轴方向的空白分配到元素的一侧
+
+align-items
+
+- 设置元素在侧轴上的对齐方式
+- stretch 拉伸，元素会自动拉伸将侧轴撑满
+- start 元素靠侧轴的起始位置对齐
+- end 元素靠侧轴的结束位置对齐
+- center 元素在侧轴上居中对齐
+
+align-content
+
+- 设置元素在侧轴上空白空间的分配
+- space-between 将侧轴方向空白位置分配到两个元素之间
+- space-around 将侧轴方向空白位置分配到元素周围
+- space-evenly 将侧轴方向的空白分配到元素的一侧
+
+元素居中的方式：
+
+- 利用 margin:0 auto 来实现水平居中
+- 利用定位来实现水平和垂直居中
+- 利用弹性盒来实现水平和垂直居中
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      ul {
+        display: flex;
+        flex-flow: wrap;
+        /* justify-content: center; */
+        /* align-items: center; */
+        align-content: space-evenly;
+        width: 300px;
+        height: 600px;
+        border: 5px solid red;
+        list-style: none;
+      }
+
+      li {
+        width: 100px;
+        height: 100px;
+        flex-shrink: 0;
+        line-height: 100px;
+        text-align: center;
+      }
+
+      li:first-child {
+        background-color: #bfa;
+      }
+
+      li:nth-child(2) {
+        background-color: orange;
+      }
+
+      li:nth-child(3) {
+        background-color: yellowgreen;
+      }
+
+      li:nth-child(4) {
+        background-color: skyblue;
+      }
+
+      li:nth-child(5) {
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+    </ul>
+  </body>
+</html>
+```
+
+## 弹性子元素的伸缩
