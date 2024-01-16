@@ -1195,8 +1195,8 @@ sidebar_position: 9
     - 可以使用 name 配置项指定组件在开发者工具中呈现的名字
 - 关于组件标签
   - 第一种写法：`<school></school>`
-  - 第二种写法：<school/>
-  - 注意：不使用脚手架时，<school/>会导致后续组件不能渲染
+  - 第二种写法：`<school/>`
+  - 注意：不使用脚手架时，`<school/>`会导致后续组件不能渲染
 - 一个简写方式
   - const school = Vue.extend(options) 可以简写为 const school = options
 
@@ -1314,7 +1314,7 @@ sidebar_position: 9
 ## VueComponent
 
 - school 组件本质是一个名为 VueComponent 的构造函数，且不是程序员定义的，是 Vue.extend 生成的
-- 我们只需要写`<school></school>`或<school/>，Vue 解析时会帮我们创建 school 组件的实例对象，即 Vue 帮我们执行 new VueComponent(options)
+- 我们只需要写`<school></school>`或`<school/>`，Vue 解析时会帮我们创建 school 组件的实例对象，即 Vue 帮我们执行 new VueComponent(options)
 - 注意：每次调用 Vue.extend，返回的都是一个全新的 VueComponent
 - this 指向
   - 组件配置中

@@ -310,6 +310,12 @@ instance.interceptors.response.use(
 export default instance
 ```
 
+## 滚动触底的判断条件
+
+```js
+xxx.scrollHeight - xxx.scrollTop === xxx.clientHeight
+```
+
 ## 小程序和 uni-app 相关配置
 
 ### 小程序端 pinia 持久化存储

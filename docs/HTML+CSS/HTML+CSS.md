@@ -2283,7 +2283,7 @@ z-index 可以设置为负值，设置负值后定位元素将会被文档流中
 
 - 脱离文档流
 
-offset（偏移量）
+offset(偏移量)
 
 - 四个偏移量，可以有四种组合方式
 - top left 通过左上角定位
@@ -2303,7 +2303,7 @@ offset（偏移量）
 - display: flex 块级弹性容器
 - display: inline-flex 行内弹性容器
 
-弹性子元素（弹性项）
+弹性子元素(弹性项)
 
 - 弹性容器的子元素都会自动变成弹性子元素
 - 弹性子元素都会沿着弹性容器的主轴排列
@@ -2312,7 +2312,7 @@ offset（偏移量）
 
 - 主轴就是弹性子元素的排列方向
 
-侧轴（辅轴）
+侧轴(辅轴)
 
 - 侧轴是与主轴垂直方向的轴
 
@@ -2513,3 +2513,186 @@ align-content
 ```
 
 ## 弹性子元素的伸缩
+
+弹性子元素的样式(弹性项的样式)
+
+flex-basis
+
+- 弹性子元素的基础大小，会根据主轴的方向自动设置 width 或 height
+- 主轴水平，设置宽度
+- 主轴垂直，设置高度
+- 可选值：
+  - auto 默认值 以元素 width 或 height 为准
+
+flex-shrink
+
+- 弹性子元素的收缩系数
+- 当父元素容纳不下所有子元素时，如何自动缩小元素大小
+- 元素的收缩是根据 flex-basis 和 flex-shrink 综合计算的
+- 收缩系数越大，元素基础大小越大，元素就缩的越多
+- 默认值为 1，可以根据需要设置，如果设置为 0 则表示不收缩
+
+flex-grow
+
+- 弹性子元素的生长系数
+- 当容器中有富余空间时，如何分配到子元素
+- 默认值 0，元素默认不会变大
+
+flex
+
+- 上述三个属性的简写属性
+- 属性顺序：
+  - grow shrink basis
+- 可选值：
+  - initial 默认值 0 1 auto
+  - auto 相当于 1 1 auto
+  - none 相当于 0 0 auto
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      ul {
+        display: flex;
+        width: 800px;
+        border: 5px solid red;
+        list-style: none;
+      }
+
+      li {
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        /* flex-basis: 200px; */
+        /* flex-grow: 1; */
+        /* flex: 0 0 200px; */
+        flex: auto;
+      }
+
+      li:first-child {
+        background-color: #bfa;
+        /* flex-grow: 1; */
+      }
+
+      li:nth-child(2) {
+        background-color: orange;
+        /* flex-grow: 2; */
+      }
+
+      li:nth-child(3) {
+        background-color: yellowgreen;
+        /* flex-grow: 3; */
+      }
+
+      li:nth-child(4) {
+        background-color: skyblue;
+        /* flex-grow: 4; */
+      }
+
+      li:nth-child(5) {
+        background-color: yellow;
+        /* flex-grow: 5; */
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+    </ul>
+  </body>
+</html>
+```
+
+## align-items 和 order
+
+align-self
+
+- 弹性子元素的样式
+- 用来单独设置某个弹性子元素的对齐方式
+
+order
+
+- 用来指定弹性子元素的位置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      ul {
+        display: flex;
+        align-items: start;
+        width: 800px;
+        height: 600px;
+        border: 5px solid red;
+        list-style: none;
+      }
+
+      li {
+        width: 100px;
+        /* height: 100px; */
+        line-height: 100px;
+        text-align: center;
+      }
+
+      li:first-child {
+        align-self: stretch;
+        background-color: #bfa;
+        order: 4;
+      }
+
+      li:nth-child(2) {
+        background-color: orange;
+        order: 5;
+        align-self: end;
+      }
+
+      li:nth-child(3) {
+        background-color: yellowgreen;
+        order: 1;
+      }
+
+      li:nth-child(4) {
+        background-color: skyblue;
+        order: 2;
+      }
+
+      li:nth-child(5) {
+        background-color: yellow;
+        order: 3;
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+    </ul>
+  </body>
+</html>
+```
