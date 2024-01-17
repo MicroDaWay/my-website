@@ -34,11 +34,11 @@ export default function Home() {
             熟悉 Node.js 和常用模块，在此基础上能够使用 Express
             等Web框架进行简单的服务器应用程序开发
           </li>
-          <li>熟练掌握 axios，fetch 发送网络请求，熟练掌握 Promise 处理异步逻辑</li>
-          <li>熟悉 git 常用命令，能够使用 git 进行版本控制</li>
+          <li>熟练掌握 Axios，Fetch 发送网络请求，熟练掌握 Promise 处理异步逻辑</li>
+          <li>熟悉 Git 常用命令，能够使用 Git 进行版本控制</li>
           <li>熟悉 Vue2 及 Vue3 全家桶，能够使用 Vue3 结合 TypeScript 进行类型检查</li>
-          <li>了解微信小程序和uni-app的开发</li>
-          <li>了解 Echarts 数据可视化工具的使用</li>
+          <li>了解微信小程序和 uni-app 的开发</li>
+          <li>了解 ECharts 数据可视化工具的使用</li>
           <li>了解 Java，了解 Linux 的常用命令，熟悉 MySQL 数据库的常用 SQL 语句</li>
         </ol>
         <Line title="项目经历" />
@@ -57,7 +57,7 @@ export default function Home() {
           <span className={classes.item}>项目内容：</span>
           <ol className={classes.content}>
             <li>
-              axios 的二次封装，请求拦截器携带 token，响应拦截器简化数据并对请求错误弹出错误信息
+              Axios 的二次封装，请求拦截器携带 token，响应拦截器简化数据并对请求错误弹出错误信息
             </li>
             <li>
               Pinia 集中状态管理，多个组件共享数据和方法，对用户 token 使用 localStorage 本地化存储
@@ -66,7 +66,7 @@ export default function Home() {
               划分不同等级的用户，不同等级的用户在登录系统后有不同的路由权限，根据后端的返回数据在前端实现权限管理，如动态路由、权限按钮
             </li>
             <li>统一封装处理各个页面逻辑，如增删改查、工具函数、自定义校验、处理时间格式</li>
-            <li>⽤Echarts做数据可视化展示</li>
+            <li>用ECharts做数据可视化展示</li>
             <li>一些性能优化，如路由懒加载、第三方组件库按需导入</li>
           </ol>
         </div>
@@ -75,7 +75,7 @@ export default function Home() {
           <ol className={classes.content}>
             <li>从0-1进行项目搭建</li>
             <li>对用户权限的访问控制</li>
-            <li>使用Echarts实现数据可视化展示</li>
+            <li>使用ECharts实现数据可视化展示</li>
           </ol>
         </div>
         <div>
@@ -115,9 +115,9 @@ export default function Home() {
         </div>
         <div>
           <span className={classes.item}>项目收获：</span>
-          通过该项⽬的开发，理解前后端分离的概念和开发模式，明⽩了架构设计以及开发⼈员开发规范的重要性。对Vue3
-          Componsition
-          API的使⽤熟练和理解，后端框架理解，后端数据库的设计，token鉴权理解、文件上传理解、理解后端业务设计
+          通过该项目的开发，理解前后端分离的概念和开发模式，明白了架构设计以及开发⼈员开发规范的重要性。对Vue3
+          Composition
+          API的使用更加熟练，对后端框架，后端数据库的设计，token鉴权、文件上传、后端业务设计有了更深的理解
         </div>
         <div>
           <span className={classes.item}>项目仓库地址：</span>
