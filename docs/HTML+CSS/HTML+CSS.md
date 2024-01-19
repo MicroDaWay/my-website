@@ -2696,3 +2696,274 @@ order
   </body>
 </html>
 ```
+
+## 背景相关的样式
+
+background-color
+
+- 背景颜色
+
+background-image
+
+- 背景图片
+
+background-repeat
+
+- 背景的重复方式
+- 可选值：
+  - repeat 默认值，背景图片会沿元素的水平垂直双方向重复
+  - repeat-x 水平方向重复
+  - repeat-y 垂直方向重复
+  - no-repeat 不重复
+  - space 背景图片充满元素，无法完整充满使用空白隔开
+  - round 背景图片自动缩放以充满元素
+
+background-position
+
+- 设置背景图片的位置
+- 可选值：
+  - top bottom left right center
+  - 以从上述关键字中任选两个来设置一个背景图片的位置
+  - 如果只传了一个关键字，则第二个默认为 center
+
+background-position：水平偏移量 垂直偏移量
+
+- 水平偏移量 值越大，背景图片越右移，可以设置负值
+- 垂直偏移量 值越大，背景图片越下移，可以设置负值
+
+## 雪碧图
+
+当我们第一次使用按钮时，在按钮上会有这种闪烁的现象出现，这是因为，浏览器在加载外部资源时，是以懒加载的形式来完成的，像 hover active 这些图片都是在按钮状态触发时才加载的，网速即使再快也需要时间来完成加载，在图片加载完成前，超链接处在没有背景图片可以显示的状态，所以会显示空白
+
+我们可以通过 CSS-Sprite 来解决这个问题，所谓 CSS-Sprite 就是指，将多个小的图片统一放入到一个大图片（雪碧图）中，然后通过偏移量来切换不同的图片，使用 CSS-Sprite 可以将多个小图片进行整合，减少客户端发送请求的次数，提升用户体验，在早期的网页中，几乎所有的小图标都是通过雪碧图来实现的，随着图标字体的广泛使用，雪碧图的使用也变得相对少了一些
+
+雪碧图
+
+- 雪碧图是位图，位图放大后会失真
+- 雪碧图无法修改颜色
+- 雪碧图支持彩色图标
+
+图标字体
+
+- 图标字体是矢量图，可以任意放大缩小不会失真
+- 图标字体可以任意修改颜色
+- 图标字体只支持单色图标
+
+## background-size
+
+background-size
+
+- 用来设置背景图片的尺寸
+- contain
+  - 缩放图片使得图片可以在元素中完整显示，但是元素有的地方可能会不显示背景
+- cover
+  - 缩放图片使得图片可以将元素撑满，但是图片可能会显示不全(可能会改变图片比例)
+
+注意：简写时 background-size 必须设置在 background-position 的后面，使用 / 分隔
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 400px;
+        height: 400px;
+        background: #bfa url(./016.jpg) no-repeat 0 0 / 300px;
+        /* background-size: 100% auto; */
+        /* background-size: 100% 100%; */
+        /* background-size: contain; */
+        /* background-size: cover; */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 剩余背景样式
+
+background-origin
+
+- 设置背景图片定位的原点
+- 可选值：
+  - `padding-box` 默认值，背景相对于内边距定位
+  - `border-box` 背景相对于边框定位
+  - `content-box` 背景相对于内容区定位
+
+background-clip
+
+- 设置背景图片显示的区域
+- 可选值：
+  - `border-box` 默认值，背景会延伸到边框的下面
+  - `padding-box` 背景会延伸到内边距的下面
+  - `content-box` 背景只会在内容区中显示
+
+注意：简写时 background-clip 必须设置在 background-origin 的后面，使用空格分隔
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 400px;
+        height: 400px;
+        border: 10px double red;
+        padding: 20px;
+        background: #bfa url(./016.jpg) no-repeat padding-box content-box;
+        background-size: cover;
+        /* background-clip: content-box;
+        background-origin: border-box; */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 表格(table)
+
+和日常生活中使用的表格一样，在网页中也可以创建表格，可以通过表格来表示一些格式化的数据
+
+`caption` 表格的标题
+
+`thead` 表格的头部
+
+`tbody` 表格主体
+
+`tfoot` 表格的底部
+
+`tr` 表示一行
+
+`th` 用来表示表头中的单元格
+
+`td` 表示一个单元格
+
+`rowspan` 纵向合并单元格
+
+`colspan` 横向合并单元格
+
+如果在 table 中没有写 tbody，则浏览器会自动创建 tbody，并将所有的 tr 都放入到 tbody 中
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      table {
+        border: 1px solid #000;
+        border-collapse: collapse;
+        width: 500px;
+      }
+
+      caption {
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      th,
+      td {
+        border: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <caption>
+        学生列表
+      </caption>
+      <thead>
+        <tr>
+          <th>学号</th>
+          <th>姓名</th>
+          <th>性别</th>
+          <th>年龄</th>
+          <th>住址</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>孙悟空</td>
+          <td>男</td>
+          <td>18</td>
+          <td>花果山</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>猪八戒</td>
+          <td>男</td>
+          <td>28</td>
+          <td>高老庄</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>沙和尚</td>
+          <td>男</td>
+          <td>38</td>
+          <td>流沙河</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">总计：</td>
+          <td rowspan="2">3人</td>
+        </tr>
+        <tr>
+          <td colspan="4">总计：</td>
+        </tr>
+      </tfoot>
+    </table>
+  </body>
+</html>
+```
+
+## 表格的对齐
+
+文字在 td 中会自动垂直居中
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        display: table-cell;
+        vertical-align: middle;
+        width: 400px;
+        height: 400px;
+        border: 5px solid red;
+      }
+
+      .box02 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+  </body>
+</html>
+```
