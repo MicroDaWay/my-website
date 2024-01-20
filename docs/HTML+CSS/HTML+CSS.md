@@ -2,6 +2,8 @@
 sidebar_position: 1
 ---
 
+# HTML+CSS
+
 ## HTML 简介
 
 HTML 负责网页的结构
@@ -2735,7 +2737,7 @@ background-position：水平偏移量 垂直偏移量
 
 当我们第一次使用按钮时，在按钮上会有这种闪烁的现象出现，这是因为，浏览器在加载外部资源时，是以懒加载的形式来完成的，像 hover active 这些图片都是在按钮状态触发时才加载的，网速即使再快也需要时间来完成加载，在图片加载完成前，超链接处在没有背景图片可以显示的状态，所以会显示空白
 
-我们可以通过 CSS-Sprite 来解决这个问题，所谓 CSS-Sprite 就是指，将多个小的图片统一放入到一个大图片（雪碧图）中，然后通过偏移量来切换不同的图片，使用 CSS-Sprite 可以将多个小图片进行整合，减少客户端发送请求的次数，提升用户体验，在早期的网页中，几乎所有的小图标都是通过雪碧图来实现的，随着图标字体的广泛使用，雪碧图的使用也变得相对少了一些
+我们可以通过 CSS-Sprite 来解决这个问题，所谓 CSS-Sprite 就是指，将多个小的图片统一放入到一个大图片(雪碧图)中，然后通过偏移量来切换不同的图片，使用 CSS-Sprite 可以将多个小图片进行整合，减少客户端发送请求的次数，提升用户体验，在早期的网页中，几乎所有的小图标都是通过雪碧图来实现的，随着图标字体的广泛使用，雪碧图的使用也变得相对少了一些
 
 雪碧图
 
@@ -2967,3 +2969,160 @@ background-clip
   </body>
 </html>
 ```
+
+## 表单简介
+
+在网页中，通过表单来将信息提交给服务器，使用 form 标签来创建一个表单，action 用来指定表单要提交到哪
+
+文本框
+
+- input type 属性为 text
+- 如果希望表单中的数据真的被提交给服务器，必须为表单项指定 name 属性
+
+提交按钮
+
+- input type 属性为 submit
+- 可以通过 value 属性来修改按钮上的文字
+
+## 表单项
+
+使用 input type 属性为 password 来创建密码框，密码框中的内容不会以明文显示，避免密码被偷看
+
+默认情况下，表单中的数据会通过 url 地址来发送，url 地址中?后的内容被称为查询字符串(query string)，例如：?username=admin&password=123123，查询字符串是一个一个的名值对结构，一个数据名对应一个值，多个名值对之间使用&隔开，数据发送给服务器后，服务器可以根据数据名获取对应的值
+
+单选框
+
+- 使用 input type 属性为 radio 来创建一个单选框
+- 单选框是通过 name 属性来分组的，相同 name 属性的为一组
+- 像这种选择框，不需要用户填写内容，还必须为表单项指定 value，value 最终会成为提交给服务器的值
+
+多选框
+
+- 使用 input type 属性为 checkbox 来创建多选框
+
+下拉列表
+
+- 使用 select 来创建下拉列表
+- 添加 multiple 属性后可以将下拉列表设置为多选的下拉列表
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form>
+      <div>用户名： <input type="text" name="username" /></div>
+      <div>密码： <input type="password" name="password" /></div>
+      <div>
+        性别：
+        <input type="radio" name="gender" value="1" />男
+        <input type="radio" name="gender" value="0" />女
+      </div>
+      <div>
+        爱好：
+        <input type="checkbox" name="hobby" value="1" />唱
+        <input type="checkbox" name="hobby" value="2" />跳
+        <input type="checkbox" name="hobby" value="3" />rap
+        <input type="checkbox" name="hobby" value="4" />篮球
+      </div>
+      <div>
+        你最喜欢的编程语言：
+        <select name="language">
+          <option value="JS">JavaScript</option>
+          <option value="Java">Java</option>
+          <option value="C++">C++</option>
+        </select>
+      </div>
+      <div>
+        <input type="submit" value="登录" />
+      </div>
+    </form>
+  </body>
+</html>
+```
+
+## 表单的属性
+
+placeholder
+
+- 用来设置文本框的占位符
+
+value
+
+- 文本框中可以通过 value 来指定默认值
+
+disabled
+
+- 禁用表单项，不会被提交
+
+readonly
+
+- 表单项无法修改，但是可以提交
+
+checked
+
+- 设置单选和多选是否默认选中
+
+selected
+
+- 设置默认选中的下拉项
+
+## 表单补充
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form>
+      <div>用户名： <input type="text" name="username" placeholder="admin" readonly /></div>
+      <div>密码： <input type="password" name="password" /></div>
+      <div>
+        性别：
+        <label> <input type="radio" name="gender" value="1" />男 </label>
+        <input type="radio" name="gender" value="0" id="female" checked /><label for="female"
+          >女</label
+        >
+      </div>
+      <div>
+        爱好：
+        <input type="checkbox" name="hobby" value="1" checked />唱
+        <input type="checkbox" name="hobby" value="2" checked />跳
+        <input type="checkbox" name="hobby" value="3" />rap
+        <input type="checkbox" name="hobby" value="4" />篮球
+      </div>
+      <div>
+        你最喜欢的编程语言：
+        <select name="language">
+          <option value="JS">JavaScript</option>
+          <option value="Java" selected>Java</option>
+          <option value="C++">C++</option>
+        </select>
+      </div>
+      <div>
+        <input type="submit" value="登录" />
+        <input type="reset" />
+        <input type="button" value="按钮" />
+      </div>
+      <div>
+        <textarea cols="30" rows="10"></textarea>
+      </div>
+      <div>
+        <button type="submit">登录</button>
+        <button type="reset">重置</button>
+        <button type="button">按钮</button>
+      </div>
+    </form>
+  </body>
+</html>
+```
+
+## 居中的总结
