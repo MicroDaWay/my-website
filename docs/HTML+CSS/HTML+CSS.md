@@ -3126,3 +3126,249 @@ selected
 ```
 
 ## 居中的总结
+
+**使用盒子模型**
+
+- 直接通过盒子模型 margin: 0 auto; 来实现居中
+- 原理：
+  - 利用了盒子模型在水平布局时的等式
+  - 左右外边距 + 可见框宽度 = 包含块宽度
+- 缺点：
+  - 不能处理垂直居中问题
+  - 居中的元素必须指定宽度
+
+**使用定位**
+
+- 通过如下代码来实现：
+  ```css
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  ```
+- 原理：
+  - 利用定位后新的等式来实现居中
+  - 左右偏移量 + 左右外边距 + 可见框的宽度 = 包含块的宽度
+  - 上下偏移量 + 上下外边距 + 可见框的高度 = 包含块的高度
+- 缺点：
+  - 设置的样式稍微多一些
+  - 必须指定元素的大小
+
+**通过表格来居中**
+
+- 将父元素的 display 设置 table-cell，然后通过 vertical-align:middle 来实现垂直居中
+- 然后再通过子元素的 margin:0 auto; 来实现居中
+- 也可以将子元素转换为 inline-block，然后通过 text-align:center 来实现水平居中
+- 缺点：
+  - 父元素设置为单元格后，默认宽度被内容撑开
+
+**通过弹性盒来居中**
+
+- 代码：
+  ```css
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  ```
+- 缺点：
+  - 几乎没有
+
+## CSS 绘制三角形
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 0;
+        height: 0;
+        /* border-top: 10px solid red; */
+        border-bottom: 10px solid orange;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 隐藏一个元素
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        /* display: none; */
+        /* visibility: hidden; */
+        /* opacity: 0; */
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    111
+  </body>
+</html>
+```
+
+## 变形简介
+
+通过变形可以对元素的位置，大小、角度等进行修改
+
+transform
+
+- 用来设置变形
+- 需要通过不同的变形函数来实现元素的变形
+- translateX() x 轴平移
+- translateY() y 轴平移
+- 设置平移时，如果使用百分比单位，百分比是相对于元素自身大小计算的
+- 当我们对元素进行变形时，只会影响到元素自身，不会影响其他元素的位置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        /* margin-left: -100px;
+        margin-top: -100px; */
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        transform: translateX(-50%) translateY(-50%);
+      }
+
+      .box02 {
+        width: 200px;
+        height: 200px;
+        background-color: tomato;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box02"></div>
+  </body>
+</html>
+```
+
+## 平移
+
+perspective
+
+- 用来设置透视的效果
+- 需要一个长度作为值，长度表示人眼和屏幕的距离
+
+translateZ
+
+- 用来设置 z 轴平移
+- z 轴平移视觉上会感觉到元素大小的变化
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        perspective: 800px;
+      }
+
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        transition: all 0.5s;
+      }
+
+      .box01:hover {
+        /* transform: translateX(100px) translateY(200px) translateZ(200px); */
+        /* transform: translate3d(100px, 200px, 200px); */
+        transform: translate(100px, 200px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 旋转
+
+- `rotateX` 沿 x 轴旋转
+- `rotateY` 沿 y 轴旋转
+- `rotateZ` 沿 z 轴旋转
+- 单位：
+  - deg 度
+  - turn 圈
+- `transform-origin` 指定变形的原点
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        perspective: 800px;
+      }
+
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        transition: all 3s;
+        transform-origin: left bottom;
+      }
+
+      .box01:hover {
+        /* transform: rotateZ(90deg); */
+        transform: rotateZ(1turn);
+        /* transform: translateX(100px) rotateZ(45deg); */
+        /* transform: rotateZ(45deg) translateX(100px); */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 缩放
