@@ -3372,3 +3372,397 @@ translateZ
 ```
 
 ## 缩放
+
+`scaleX`
+
+- x 轴缩放
+
+`scaleY`
+
+- y 轴缩放
+
+`scale`
+
+- x 轴 y 轴都缩放
+
+`scaleZ`
+
+- z 轴缩放（需要 3d 下才能看出效果）
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+        margin: 200px auto;
+        transition: all 1s;
+      }
+
+      .box01:hover {
+        /* transform: scaleX(2); */
+        /* transform: scaleY(2.5); */
+        transform: scale(0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 立方体
+
+https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        perspective: 800px;
+      }
+
+      ul {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        list-style: none;
+        margin: 200px auto;
+        transform-style: preserve-3d;
+        transition: all 1s;
+      }
+
+      ul:hover {
+        transform: rotateY(45deg) scaleZ(2);
+      }
+
+      li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        color: #fff;
+        font-size: 30px;
+      }
+
+      li:nth-child(1) {
+        background-color: orange;
+        z-index: 1;
+        transform: translateZ(100px);
+      }
+
+      li:nth-child(2) {
+        background-color: #bfa;
+        transform: rotateY(90deg) translateZ(100px);
+      }
+
+      li:nth-child(3) {
+        background-color: tomato;
+        transform: rotateX(90deg) translateZ(100px);
+      }
+
+      li:nth-child(4) {
+        background-color: deepskyblue;
+        transform: rotateX(-90deg) translateZ(100px);
+      }
+
+      li:nth-child(5) {
+        background-color: yellowgreen;
+        transform: rotateY(-90deg) translateZ(100px);
+      }
+
+      li:nth-child(6) {
+        background-color: brown;
+        z-index: -1;
+        transform: rotateY(180deg) translateZ(100px);
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+      <li>6</li>
+    </ul>
+  </body>
+</html>
+```
+
+## 过渡(transition)
+
+通过过渡可以使得元素在样式发生变化时，一点一点的改变
+
+`transition-property`
+
+- 应用过渡效果的属性
+- all 表示所有样式
+
+`transition-duration`
+
+- 过渡效果所花费的时间
+- 单位：
+  - s 秒
+  - ms 毫秒
+
+`transition-delay`
+
+- 过渡效果的延时
+
+`transition-timing-function`
+
+- 指定过渡的时间曲线
+- 可选值：
+  - ease 默认值 先加速然后减速
+  - linear 匀速运动
+  - ease-in 加速运动
+  - ease-out 减速运动
+  - 贝塞尔曲线 自定义运动方式 https://cubic-bezier.com/
+  - steps() 分步执行动画
+
+`transition`
+
+- 过渡的简写属性，可以同时设置过渡的所有样式
+- transition-duration 必须写在 transition-delay 的前面
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        /* transition-property: width, background-color;
+        transition-duration: 1s;
+        transition-delay: 2s;
+        transition-timing-function: linear; */
+        /* transition: all steps(5, jump-start) 1s 5s; */
+        transition: all linear 1s 5s;
+      }
+
+      .box01:hover {
+        width: 400px;
+        background-color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box02"></div>
+  </body>
+</html>
+```
+
+## 动画简介
+
+`animation-name`
+
+- 指定动画的名字
+
+`animation-duration`
+
+- 一次动画执行的时间
+
+`animation-iteration-count`
+
+- 动画执行的次数
+- infinite 一直执行
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+        animation-name: move;
+        animation-duration: 5s;
+      }
+
+      @keyframes move {
+        from {
+          margin-left: 0;
+        }
+
+        to {
+          margin-left: 500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 关键帧
+
+通过 keyframes 来定义关键帧
+
+- from 表示动画的开始位置
+- to 表示动画的结束位置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+        animation-name: move;
+        animation-duration: 5s;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes move {
+        25% {
+          margin-top: 100px;
+          margin-left: 0;
+        }
+
+        50% {
+          margin-top: 100px;
+          margin-left: 500px;
+        }
+
+        75% {
+          margin-left: 500px;
+          margin-top: 0;
+        }
+
+        100% {
+          margin-left: 0;
+          margin-top: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 动画样式
+
+`animation-delay`
+
+- 动画的延时
+
+`animation-timing-function`
+
+- 时间函数
+
+`animation-direction`
+
+- 动画的方向
+- 可选值：
+  - normal 默认值
+  - reverse 动画反向执行
+  - alternate 动画正向反向交替执行
+  - alternate-reverse 和 alternate 相反
+
+`animation-fill-mode`
+
+- 动画的填充模式
+- 可选值：
+  - none 默认值 延迟时元素保持不变，动画执行结束恢复原状
+  - forwards 延迟时元素保持不变，动画执行结束保持 to 的状态
+  - backwards 延迟时元素变为 from 状态，动画执行结束恢复原状
+  - both 延迟时元素变成 from 状态，动画执行结束保持 to 的状态
+
+`animation-play-state`
+
+- 动画的播放状态
+- 可选值：
+  - paused 暂停
+  - running 运行
+
+`animation`
+
+- 简写属性可以同时设置所有动画相关的样式
+- animation-duration 必须设置在 animation-delay 前面
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+        /* animation-name: move; */
+        /* animation-duration: 5s; */
+        /* animation-iteration-count: 2; */
+        /* animation-delay: 5s; */
+        /* animation-timing-function: ease; */
+        /* animation-direction: alternate-reverse; */
+        /* animation-fill-mode: both; */
+        /* animation-play-state: running; */
+        animation: move 5s 3s;
+      }
+
+      .box01:hover {
+        animation-play-state: paused;
+      }
+
+      @keyframes move {
+        from {
+          margin-left: 0;
+          background-color: deepskyblue;
+        }
+
+        to {
+          margin-left: 500px;
+          background-color: orange;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
