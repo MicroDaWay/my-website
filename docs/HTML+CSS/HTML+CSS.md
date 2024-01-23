@@ -3766,3 +3766,571 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
   </body>
 </html>
 ```
+
+## 精灵动画
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        width: 132px;
+        height: 271px;
+        background-image: url(./mitu.png);
+        animation: mitu 1s steps(4) infinite;
+      }
+
+      @keyframes mitu {
+        from {
+          background-position: 0 0;
+        }
+
+        to {
+          background-position: -528px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## steps
+
+设置 steps 时，from 不算一步
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .box01 {
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+        animation: move 5s steps(2) forwards;
+      }
+
+      @keyframes move {
+        from {
+          margin-left: 100px;
+        }
+
+        to {
+          margin-left: 500px;
+          background-color: orange;
+        }
+      }
+
+      .box02 {
+        position: absolute;
+        top: 0;
+        left: 500px;
+        width: 5px;
+        height: 300px;
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+    <div class="box02"></div>
+  </body>
+</html>
+```
+
+## 钟表练习
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .clock {
+        position: relative;
+        width: 500px;
+        height: 500px;
+        border: 2px solid #000;
+        border-radius: 50%;
+        margin: 100px auto;
+        background-image: url(./clock.png);
+        background-size: contain;
+      }
+
+      .hour {
+        position: absolute;
+        bottom: 50%;
+        left: 50%;
+        width: 4px;
+        height: 25%;
+        background-color: orange;
+        transform-origin: bottom;
+        animation: clock-run 43200s linear infinite;
+      }
+
+      .minute {
+        position: absolute;
+        bottom: 50%;
+        left: 50%;
+        width: 3px;
+        height: 35%;
+        background-color: red;
+        transform-origin: bottom;
+        animation: clock-run 3600s linear infinite;
+      }
+
+      .second {
+        position: absolute;
+        bottom: 50%;
+        left: 50%;
+        width: 2px;
+        height: 45%;
+        background-color: #000;
+        transform-origin: bottom;
+        animation: clock-run 60s linear infinite;
+      }
+
+      @keyframes clock-run {
+        from {
+          transform: rotateZ(0deg);
+        }
+
+        to {
+          transform: rotateZ(1turn);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="clock">
+      <div class="hour"></div>
+      <div class="minute"></div>
+      <div class="second"></div>
+    </div>
+  </body>
+</html>
+```
+
+## 布局回顾
+
+原始的布局方式（table）
+
+网格布局（grid）
+
+- 网格布局的方式和 table 类似
+- 网格布局将网页分为了一行一行和一列一列的，通过对这些行和列的设置帮助我们完成布局
+- 网格布局比较适用于复杂的布局
+- 相较于弹性盒，无需设置多余的结构
+- 结构简单，样式复杂
+
+弹性盒（flex）
+
+- 弹性盒擅于单行单列
+- 多行多列布局时，需要使用不同的结构组合使用
+- 结构复杂，样式简单
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <table border width="50%">
+      <tr height="100">
+        <td colspan="2">网页的头部</td>
+      </tr>
+      <tr height="300">
+        <td width="100">菜单</td>
+        <td>
+          <table border width="100%" height="300">
+            <tr hight="100">
+              <td colspan="3">上半部分</td>
+            </tr>
+            <tr hight="100">
+              <td>图片</td>
+              <td>图片</td>
+              <td>图片</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr height="100">
+        <td colspan="2">底部</td>
+      </tr>
+    </table>
+  </body>
+</html>
+```
+
+## 网格布局简介
+
+网格容器
+
+- 要使用网格布局必须先设置网格容器
+- 使用 display:grid 或 display:inline-grid
+- 默认情况下，我们开启的是一个单列的网格布局
+
+`grid-template-columns`
+
+- 用来设置网格布局的列数
+
+`grid-template-rows`
+
+- 用来设置网格布局的行数
+
+`repeat()`
+
+- 重复设置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer {
+        display: grid;
+        /* grid-template-columns: 100px 200px 100px 400px; */
+        /* grid-template-columns: 100px auto 200px 200px; */
+        /* grid-template-columns: 1fr 1fr 1fr 1fr; */
+        /* grid-template-columns: repeat(2, 1fr 2fr); */
+        grid-template-columns: 2fr repeat(2, 1fr 2fr);
+        grid-template-rows: 100px 200px;
+        width: 800px;
+        border: 5px solid red;
+      }
+
+      .box01 {
+        background-color: #bfa;
+      }
+
+      .box02 {
+        background-color: orange;
+      }
+
+      .box03 {
+        background-color: deepskyblue;
+      }
+
+      .box04 {
+        background-color: tomato;
+      }
+
+      .box05 {
+        background-color: brown;
+      }
+
+      .box06 {
+        background-color: chocolate;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">box01</div>
+      <div class="box02">box02</div>
+      <div class="box03">box03</div>
+      <div class="box04">box04</div>
+      <div class="box05">box05</div>
+      <div class="box06">box06</div>
+    </div>
+  </body>
+</html>
+```
+
+## 网格的合并
+
+网格项
+
+- 网格容器的子元素都会自动变为网格项
+- `grid-column-start` 网格列的起始位置
+- `grid-column-end` 网格列的结束位置
+- `grid-row-start` 网格行的起始位置
+- `grid-row-end` 网格行的结束位置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr 2fr);
+        grid-template-rows: 100px 200px 100px;
+        width: 800px;
+        border: 5px solid red;
+      }
+
+      .box01 {
+        background-color: #bfa;
+      }
+
+      .box02 {
+        background-color: orange;
+        grid-column-start: 2;
+        /* grid-column-end: -1; */
+        grid-column-end: span 2;
+        grid-row-start: 1;
+        grid-row-end: 3;
+      }
+
+      .box03 {
+        background-color: deepskyblue;
+      }
+
+      .box04 {
+        background-color: tomato;
+      }
+
+      .box05 {
+        background-color: brown;
+      }
+
+      .box06 {
+        background-color: chocolate;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">box01</div>
+      <div class="box02">box02</div>
+      <div class="box03">box03</div>
+      <div class="box04">box04</div>
+      <div class="box05">box05</div>
+      <div class="box06">box06</div>
+    </div>
+  </body>
+</html>
+```
+
+## 网格布局练习
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: grid;
+        grid-template-columns: 100px 150px 150px 150px;
+        grid-template-rows: 100px 150px 150px 100px;
+      }
+
+      .box01 {
+        grid-column-start: 1;
+        grid-column-end: -1;
+        background-color: #bfa;
+      }
+
+      .box02 {
+        grid-row-start: 2;
+        grid-row-end: 4;
+        background-color: orange;
+      }
+
+      .box03 {
+        grid-column-start: 2;
+        grid-column-end: -1;
+        background-color: tomato;
+      }
+
+      .box04 {
+        background-color: deepskyblue;
+      }
+
+      .box05 {
+        background-color: brown;
+      }
+
+      .box06 {
+        background-color: chocolate;
+      }
+
+      .box07 {
+        grid-column-start: 1;
+        grid-column-end: -1;
+        background-color: yellowgreen;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">网页的头部</div>
+    <div class="box02">菜单</div>
+    <div class="box03">上半部分</div>
+    <div class="box04">图片</div>
+    <div class="box05">图片</div>
+    <div class="box06">图片</div>
+    <div class="box07">底部</div>
+  </body>
+</html>
+```
+
+## 网格的样式
+
+可以通过 z-index 来调整网格项的层级
+
+`grid-column`
+
+- 同时设置列开始和列结束
+- grid-column: 列开始/列结束
+
+`grid-row`
+
+- 同时设置行开始和行结束
+- grid-row: 行开始/行结束
+
+`grid-area`
+
+- 同时设置行列的开始和结束
+- grid-area: 行开始/列开始/行结束/列结束
+
+`column-gap`
+
+- 列间距
+
+`row-gap`
+
+- 行间距
+
+`gap`
+
+- 同时指定行间距和列间距
+- grid-gap: 行间距 列间距
+
+`justify-items`
+
+- 设置网格中元素水平方向的对齐方式
+
+`align-items`
+
+- 设置网格中元素垂直方向的对齐方式
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: grid;
+        grid-template-columns: 100px 150px 150px 150px;
+        grid-template-rows: 100px 150px 150px 100px;
+        /* column-gap: 10px;
+        row-gap: 20px; */
+        gap: 20px 10px;
+      }
+
+      .box01 {
+        /* grid-column: 1/-1;
+        grid-row: 1/2; */
+        grid-area: 1/1/2/-1;
+        background-color: #bfa;
+        z-index: 1;
+      }
+
+      .box02 {
+        grid-row: 2/4;
+        grid-column: 1/2;
+        background-color: orange;
+      }
+
+      .box03 {
+        grid-column: 2/-1;
+        background-color: tomato;
+      }
+
+      .box04 {
+        background-color: deepskyblue;
+      }
+
+      .box05 {
+        background-color: brown;
+      }
+
+      .box06 {
+        background-color: chocolate;
+      }
+
+      .box07 {
+        grid-column: 1/-1;
+        background-color: yellowgreen;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">网页的头部</div>
+    <div class="box02">菜单</div>
+    <div class="box03">上半部分</div>
+    <div class="box04">图片</div>
+    <div class="box05">图片</div>
+    <div class="box06">图片</div>
+    <div class="box07">底部</div>
+  </body>
+</html>
+```
+
+**网格布局水平垂直居中**
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box01 {
+        display: grid;
+        /* justify-items: center;
+        align-items: center; */
+        place-items: center;
+        width: 500px;
+        height: 500px;
+        border: 5px solid red;
+      }
+
+      .box02 {
+        width: 100px;
+        height: 100px;
+        background-color: #bfa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01">
+      <div class="box02"></div>
+    </div>
+  </body>
+</html>
+```
