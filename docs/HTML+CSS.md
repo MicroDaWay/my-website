@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # HTML+CSS
@@ -3387,7 +3387,7 @@ translateZ
 
 `scaleZ`
 
-- z 轴缩放（需要 3d 下才能看出效果）
+- z 轴缩放(需要 3d 下才能看出效果)
 
 ```html
 <!DOCTYPE html>
@@ -3930,9 +3930,9 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
 
 ## 布局回顾
 
-原始的布局方式（table）
+原始的布局方式(table)
 
-网格布局（grid）
+网格布局(grid)
 
 - 网格布局的方式和 table 类似
 - 网格布局将网页分为了一行一行和一列一列的，通过对这些行和列的设置帮助我们完成布局
@@ -3940,7 +3940,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
 - 相较于弹性盒，无需设置多余的结构
 - 结构简单，样式复杂
 
-弹性盒（flex）
+弹性盒(flex)
 
 - 弹性盒擅于单行单列
 - 多行多列布局时，需要使用不同的结构组合使用
@@ -4312,9 +4312,9 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
     <style>
       .box01 {
         display: grid;
-        /* justify-items: center;
-        align-items: center; */
-        place-items: center;
+        justify-items: center;
+        align-items: center;
+        /* place-items: center; */
         width: 500px;
         height: 500px;
         border: 5px solid red;
@@ -4331,6 +4331,515 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
     <div class="box01">
       <div class="box02"></div>
     </div>
+  </body>
+</html>
+```
+
+## 网格的对齐
+
+`justify-items / align-items`
+
+- 设置网格项在轨道中的对齐方式
+
+`justify-content / align-content`
+
+- 设置网格项的整体对齐方式
+
+`justify-self / align-self`
+
+- 单独设置某一个网格项在轨道中的对齐方式
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer {
+        display: grid;
+        grid-template-columns: repeat(3, 200px);
+        grid-template-rows: 100px 100px;
+        justify-content: center;
+        align-content: center;
+        /* justify-items: center;
+        align-items: center; */
+        gap: 10px;
+        width: 800px;
+        height: 300px;
+        border: 5px solid red;
+      }
+
+      .outer div {
+        border: 2px solid deepskyblue;
+      }
+
+      .box01 {
+        justify-self: center;
+        align-self: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">box01</div>
+      <div class="box02">box02</div>
+      <div class="box03">box03</div>
+      <div class="box04">box04</div>
+      <div class="box05">box05</div>
+      <div class="box06">box06</div>
+    </div>
+  </body>
+</html>
+```
+
+## 命名网格线
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer {
+        display: grid;
+        grid-template-columns: [a] 200px [b] 200px [c] 200px [d];
+        grid-template-rows: [head-row-start] 100px [head-row-end side-row-start] 100px [side-row-end];
+        gap: 10px;
+        width: 800px;
+        border: 5px solid red;
+      }
+
+      .outer div {
+        border: 2px solid deepskyblue;
+      }
+
+      .box01 {
+        grid-column: a/c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">box01</div>
+      <div class="box02">box02</div>
+      <div class="box03">box03</div>
+      <div class="box04">box04</div>
+      <div class="box05">box05</div>
+      <div class="box06">box06</div>
+    </div>
+  </body>
+</html>
+```
+
+## 命名区域布局
+
+`grid-template-areas`
+
+- 可以设置命名的区域如何在容器中排布
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .outer {
+        display: grid;
+        grid-template-columns: 200px 200px 200px 200px;
+        grid-template-rows: 100px 150px 150px 100px;
+        grid-template-areas:
+          'header header header .'
+          'side main main main'
+          'side main main main'
+          'footer footer footer footer';
+        gap: 10px;
+        border: 5px solid red;
+      }
+
+      .outer div {
+        border: 2px solid deepskyblue;
+      }
+
+      .box01 {
+        grid-area: header;
+      }
+
+      .box02 {
+        grid-area: side;
+      }
+
+      .box03 {
+        grid-area: main;
+      }
+
+      .box04 {
+        grid-area: footer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">头部</div>
+      <div class="box02">侧边栏</div>
+      <div class="box03">主要内容</div>
+      <div class="box04">底部</div>
+    </div>
+  </body>
+</html>
+```
+
+## 自动行列
+
+`grid-auto-flow`
+
+- 网格项的排列方式
+- 可选值：
+  - row 默认值，优先填充行，行满了会自动创建新行
+  - column 优先填充列，列满了会自动换到下一列，此时不会自动生成行
+  - dense 紧凑的，容器中有位置，后边的元素就会自动的补位(适用于瀑布流布局)
+
+`grid-auto-rows`
+
+- 指定自动行的高度
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .outer {
+        display: grid;
+        grid-auto-flow: dense;
+        /* grid-template-rows: repeat(3, 100px); */
+        /* grid-auto-columns: 200px; */
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 100px 200px 300px;
+        gap: 10px;
+        width: 800px;
+        border: 5px solid red;
+      }
+
+      .outer div {
+        border: 2px solid deepskyblue;
+      }
+
+      .box02 {
+        grid-row: 2/3;
+      }
+
+      .box03 {
+        grid-column: 3/4;
+      }
+
+      .box05 {
+        grid-column: 3/4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">box01</div>
+      <div class="box02">box02</div>
+      <div class="box03">box03</div>
+      <div class="box04">box04</div>
+      <div class="box05">box05</div>
+      <div class="box06">box06</div>
+      <div class="box07">box07</div>
+      <div class="box08">box08</div>
+      <div class="box09">box09</div>
+      <div class="box10">box10</div>
+      <div class="box11">box11</div>
+      <div class="box12">box12</div>
+    </div>
+  </body>
+</html>
+```
+
+## 网格补充
+
+`minmax(最小值, 最大值)`
+
+- 用来设置行和列的大小
+- 可选值：
+  - 像素、auto、min-content、max-content
+
+`repeat()`
+
+- 自动重复设置行和列
+- 第一个值：
+  - auto-fill 自动计算列，尽可能多的生成列
+  - auto-fit 自动计算列，尽量让列可以容纳下所有元素
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .outer {
+        display: grid;
+        /* grid-template-columns: 100px 200px minmax(300px, auto); */
+        /* grid-template-columns: 100px 200px minmax(auto, min-content); */
+        /* grid-template-columns: repeat(auto-fill, minmax(50px, auto)); */
+        grid-template-columns: repeat(auto-fit, minmax(50px, auto));
+        grid-auto-rows: minmax(100px, auto);
+        gap: 10px;
+        border: 5px solid red;
+      }
+
+      .outer div {
+        border: 2px solid deepskyblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="box01">box01</div>
+      <div class="box02">box02</div>
+      <div class="box03">box03</div>
+      <div class="box04">box04</div>
+      <div class="box05">box05</div>
+      <div class="box06">box06</div>
+      <div class="box07">box07</div>
+      <div class="box08">box08</div>
+      <div class="box09">box09</div>
+      <div class="box10">box10</div>
+      <div class="box11">box11</div>
+      <div class="box12">box12</div>
+    </div>
+  </body>
+</html>
+```
+
+## 移动端
+
+- 像素(px)
+  - 像素是屏幕上一个一个会发光的小点
+  - 物理像素
+    - 会发光的小点
+  - CSS 像素
+    - 我们编写样式时使用 px
+  - 我们编写样式时使用的是 CSS 像素，屏幕呈现图像时使用的是物理像素
+    - 默认情况下在 pc 中，一个 CSS 像素对应一个物理像素(1 : 1)
+  - 当我们在浏览器中或系统中对网页进行缩放时，像素比会发生变化
+    - 比如：当我们将网页放大 1.5 倍时，CSS 像素是不变的
+    - 而物理像素会变为原来的 1.5 倍大 (1 : 1.5)
+- 视口(viewport)
+  - 浏览器的可视区域称为视口
+- 移动端
+  - 移动端的项目通常都会运行在手机中
+    - 手机屏幕清晰度都是非常的高的(物理像素越小，清晰度就越高)
+  - 例子：
+    - 显示器
+      - 宽 两尺半 1920px
+    - 手机
+      - 宽 半尺 1170px
+    - 从这个粗糙的案例我们能够得出一个结论：
+      - 手机的单个像素要远远地小于显示器的！
+    - 同样是 12px 的字体，在显示器中看起来正合适
+      - 但是到了手机中，就是看不清的
+      - 也就是说，如果将 pc 端的页面直接在手机中呈现，效果是很差的！
+    - 为了使得 pc 端页面可以在手机中正常显示
+      - 在显示 pc 端页面时，移动端的浏览器会自动将视口宽度转换为 980px
+      - 如果 pc 端页面大小超过了 980px，浏览器会自动对页面进行缩小，使得网页可以在浏览器中完整呈现
+      - 但是即使这样，网页在移动端浏览器中的体验依然非常的不好
+    - 移动端浏览器，默认的像素比是：
+      - 980 : xxx
+      - 980 : 1170
+      - 980 : 1080
+    - 为了在移动端有一个更好的体验，公司可以为手机设置一个专门的页面
+    - 每一个移动设备在出厂时，都会设计一个最佳的像素的比，只有达到最佳的像素比时，才能确保网页在移动端中有一个最佳的效果。
+    - 例如：
+      - iPhone 12 pro 的像素比是 1:3 1 个 css 像素 对应 3 个物理像素
+    - 要使得浏览器有一个最佳效果，必须先使得网页变成最佳像素比
+      - 目前：980 : 1170 390 : 1170
+      - 期望：1 : 3
+      - 可以通过调整视口的大小来改变像素比
+      - `<meta name="viewport" content="width=390px">`
+        - 当一个视口的宽度可以使得像素比变为最佳像素比时，这个视口(宽)就被称为完美视口
+        - iPhone12 pro 的完美视口就是 390
+        - 但是！不同手机的完美视口是不同的，如果简单粗暴设置为 390，这样一来只能在该手机中取得最佳效果
+          - 其他手机就不行了！
+        - 我们希望我们的页面在不同的设备中都能以完美视口来呈现
+          - 在 12pro，视口是 390
+          - 在 se 中， 视口是 375
+          - 在 max 中， 视口是 414
+        - `<meta name="viewport" content="width=device-width">` 可以确保网页在任何设备下都会有一个完美视口！
+        - 记住！凡是开发需要在移动端中访问的页面，都要加上完美视口
+- 适配问题
+  - 开启完美视口后，任何移动设备都能获得一个最佳的浏览效果
+    - 但是，这样却导致了不同设备下视口宽度不同
+    - 同样是 390px，在 iphone 12 pro 下是全屏，但到 iphone se 下就出现了滚动条，到了 iPad 下就剩下了一半了！
+    - 这样一来，我们就不能在移动端项目中再使用 px 作为单位了！
+  - 可以使用 vw 来解决这个问题，vw - viewport width 视口宽度
+    - 1vw = 1% 视口宽度
+- 实际开发中，设计图的宽度都是像素为单位的，有 375 750 1125 414 ...
+  - 在将设计图转换为页面时，单位 vw
+  - 以 750px 宽的设计图为例 750px = 100vw 1px = 0.1333333vw
+  - 如何显示 688px x 91px 的元素 89.44vw x 11.83vw
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: calc(100vw / 750);
+      }
+
+      body {
+        font-size: 16px;
+      }
+
+      .box01 {
+        width: 688rem;
+        height: 92rem;
+        background-color: #bfa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box01"></div>
+  </body>
+</html>
+```
+
+## 媒体查询
+
+- @media 设备类型{}
+  - all 任意类型的设备
+  - screen 带有屏幕的设备
+  - print 打印设备
+  - speech 屏幕阅读器
+- min-width 指定最小视口，大于等于指定值时，样式生效
+- max-width 指定最大视口，小于等于指定值时，样式生效
+- , 或
+- not 非
+- and 与
+- only
+  - 主要是避免一些兼容性的问题
+- 媒体查询(media query)
+  - 通过媒体查询可以为不同的设备，不同的屏幕大小设置不同的样式
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* 
+        @media screen {
+          body {
+            color: orange;
+          }
+        }
+      */
+
+      /* 
+        @media print {
+          body {
+            color: red;
+          }
+        }
+      */
+
+      /* 
+        @media speech {
+          body {
+            color: blue;
+          }
+        }
+      */
+
+      /* 
+        @media all {
+          body {
+            color: tomato;
+          }
+        }
+      */
+
+      /* 
+        @media (min-width: 500px) {
+          body {
+            color: red;
+          }
+        }
+      */
+
+      /* 
+        @media not print {
+          body {
+            color: red;
+          }
+        }
+      */
+
+      /* 
+        @media screen, print {
+          body {
+            color: brown;
+          }
+        }
+      */
+
+      /* 
+        @media (min-width: 500px) and (max-width: 800px) {
+          body {
+            color: red;
+          }
+        }
+      */
+
+      @media only screen {
+        body {
+          color: red;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    今天天气真不错
   </body>
 </html>
 ```
