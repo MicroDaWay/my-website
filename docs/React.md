@@ -60,11 +60,11 @@ React 就是用来代替 DOM 的
 
 - 用来创建一个 React 元素
 - 参数：
-  - 元素的名称（HTML 标签必须小写）
+  - 元素的名称(HTML 标签必须小写)
   - 标签中的属性
     - class 属性需要使用 className 来设置
     - 在设置事件时，属性名需要修改为驼峰命名法
-  - 元素的内容（子元素）
+  - 元素的内容(子元素)
 - 注意点：
   - React 元素最终会通过虚拟 DOM 转换为真实的 DOM 元素
   - React 元素一旦创建就无法修改，只能通过新创建的元素进行替换
@@ -178,7 +178,7 @@ React 就是用来代替 DOM 的
 
 ## JSX 简介
 
-声明式编程，结果导向的编程，在 React 中可以通过 JSX（JS 扩展）来创建 React 元素，JSX 需要被翻译为 JS 代码，才能被 React 执行，要在 React 中使用 JSX，必须引入 babel 来完成翻译工作，JSX 就是 React.createElement()的语法糖，JSX 在执行之前都会被 babel 转换为 js 代码
+声明式编程，结果导向的编程，在 React 中可以通过 JSX(JS 扩展)来创建 React 元素，JSX 需要被翻译为 JS 代码，才能被 React 执行，要在 React 中使用 JSX，必须引入 babel 来完成翻译工作，JSX 就是 React.createElement()的语法糖，JSX 在执行之前都会被 babel 转换为 js 代码
 
 ```html
 <!DOCTYPE html>
@@ -221,7 +221,7 @@ React 就是用来代替 DOM 的
 - JSX 不是字符串，不要加引号
 - JSX 中 HTML 标签应该小写，React 组件应该大写开头
 - JSX 中有且只有一个根标签
-- JSX 的标签必须正确结束（自结束标签必须写 / ）
+- JSX 的标签必须正确结束(自结束标签必须写 / )
 - 在 JSX 中可以使用{}嵌入表达式，有值的语句就是表达式
 - 如果表达式是 null、布尔值、undefined，将不会显示
 - 在 JSX 中，属性可以直接在标签中设置
@@ -280,7 +280,7 @@ React 就是用来代替 DOM 的
 
 ## 渲染列表
 
-\{\} 只能用来放 js 表达式，而不能放语句（if for），但是在语句中是可以去操作 JSX 的
+\{\} 只能用来放 js 表达式，而不能放语句(if for)，但是在语句中是可以去操作 JSX 的
 
 ```html
 <!DOCTYPE html>
@@ -326,7 +326,7 @@ React 就是用来代替 DOM 的
 
 - 降低 API 复杂度
 - 解决兼容问题
-- 提升性能（减少 DOM 的不必要操作）
+- 提升性能(减少 DOM 的不必要操作)
 
 每当我们调用 root.render()时，页面就会发生重新渲染，React 会通过 diffing 算法，将新的元素和旧的元素进行比较，通过比较找到发生变化的元素，并且只对变化的元素进行修改，没有发生变化的不予处理
 
@@ -457,6 +457,216 @@ root.render(<App />)
 ```js
 const App = () => {
   return <div>App组件</div>
+}
+
+export default App
+```
+
+## 类组件
+
+类组件必须要继承 React.Component，相较于函数组件，类组件的编写要麻烦一下，但是他俩的功能是一样的
+
+类组件中，必须添加一个 render()方法，且方法的返回值要是一个 jsx
+
+```js
+import React from 'react'
+
+class App extends React.Component {
+  render() {
+    return <div>我是一个类组件</div>
+  }
+}
+
+export default App
+```
+
+## 事件
+
+在 React 中事件需要通过元素的属性来设置，和原生 JS 不同，在 React 中事件的属性需要使用驼峰命名法，属性值不能直接执行代码，而是需要一个回调函数
+
+事件对象
+
+- React 事件中同样会传递事件对象，可以在响应函数中定义参数来接收事件对象
+- React 中的事件对象同样不是原生的事件对象，是经过 React 包装后的事件对象
+- 由于对象进行过包装，所以使用过程中我们无需再去考虑兼容性问题
+- 在 React 中，无法通过 return false 来取消默认行为
+
+```js
+const App = () => {
+  const clickHandler = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    alert('点击超链接')
+  }
+
+  return (
+    <div
+      onClick={() => {
+        alert('div')
+      }}
+    >
+      <button
+        onClick={() => {
+          alert(111)
+        }}
+      >
+        点我一下
+      </button>
+      <a href="https://microdaway.github.io/" onClick={clickHandler}>
+        超链接
+      </a>
+    </div>
+  )
+}
+
+export default App
+```
+
+## props 简介
+
+如果将组件中的数据全部写死，将会导致组件无法动态设置，不具有实用价值，我们希望组件数据可以由外部设置，在组件间，父组件可以通过 props(属性)向子组件传递数据
+
+在父组件中可以直接在子组件中设置属性
+
+在函数组件中，属性就相当于是函数的参数，可以通过参数来访问，可以在函数组件的形参中定义一个 props，props 指向的是一个对象，它包含了父组件中传递的所有参数
+
+**注意：props 是只读的不能修改**
+
+**父组件**
+
+```js
+import LogItem from './LogItem/LogItem'
+import './Log.css'
+
+const Log = () => {
+  return (
+    <div className="container">
+      <LogItem subject={'学习React'} time={40} />
+      <LogItem subject={'学习Vue'} time={50} />
+    </div>
+  )
+}
+
+export default Log
+```
+
+**子组件**
+
+```js
+import MyDate from './MyDate/MyDate'
+import './LogItem.css'
+
+const LogItem = (props) => {
+  return (
+    <div className="item">
+      <MyDate />
+      <div className="content">
+        <div className="subject">{props.subject}</div>
+        <div className="time">{props.time}分钟</div>
+      </div>
+    </div>
+  )
+}
+
+export default LogItem
+```
+
+## state 简介
+
+在 React 中，当组件渲染完毕后，再修改组件中的变量，不会使组件重新渲染，要使得组件可以受到变量的影响，必须在变量修改后对组件进行重新渲染，这里我们就需要一个特殊变量，当这个变量被修改时，组件会自动重新渲染
+
+state 相当于一个变量，只是这个变量在 React 中进行了注册，React 会监控这个变量的变化，当 state 发生变化时，会自动触发组件的重新渲染，使得我们的修改可以在页面中呈现出来
+
+在函数组件中，我们需要通过钩子函数来获取 state
+
+使用钩子函数 useState() 来创建 state：`import { useState } from 'react'`
+
+它需要一个值作为参数，这个值就是 state 的初始值，该函数会返回一个数组，数组中第一个元素，是初始值，初始值只用来显示数据，直接修改不会触发组件的重新渲染，数组中的第二个元素是一个函数，通常会命名为 setXxx，这个函数用来修改 state，调用其修改 state 后会触发组件的重新渲染，并且使用函数中的值作为新的 state 值
+
+```js
+import { useState } from 'react'
+import './App.css'
+
+const App = () => {
+  console.log('函数执行了')
+  const [count, setCount] = useState(1)
+
+  const subHandler = () => {
+    setCount(count - 1)
+  }
+
+  const addHandler = () => {
+    setCount(count + 1)
+  }
+
+  return (
+    <div className="app">
+      <div className="count">{count}</div>
+      <div>
+        <button onClick={subHandler}>-</button>
+        <button onClick={addHandler}>+</button>
+      </div>
+    </div>
+  )
+}
+
+export default App
+```
+
+## state 的注意事项
+
+- state 实际就是一个被 React 管理的变量，当我们通过 setState()修改变量的值时，会触发组件的自动重新渲染
+- 只有 state 值发生变化时，组件才会重新渲染
+- 当 state 的值是一个对象时，修改时是使用新的对象去替换已有对象
+- 当通过 setState 去修改一个 state 时，并不表示修改当前的 state，它修改的是组件下一次渲染时的 state 值
+- setState()会触发组件的重新渲染，它是异步的，所以当调用 setState()需要用旧 state 的值时，一定要注意，有可能出现计算错误的情况，为了避免这种情况，可以通过为 setState()传递回调函数的形式来修改 state 值
+- setState()中回调函数的返回值将会成为新的 state 值，回调函数执行时，React 会将最新的 state 值作为参数传递
+
+```js
+import { useState } from 'react'
+import './App.css'
+
+const App = () => {
+  console.log('函数执行了')
+  const [count, setCount] = useState(1)
+  const [user, setUser] = useState({
+    name: '孙悟空',
+    age: 18,
+  })
+
+  const subHandler = () => {
+    setCount(count - 1)
+  }
+
+  const addHandler = () => {
+    setTimeout(() => {
+      // setCount((preCount) => {
+      //   return preCount + 1
+      // })
+      setCount((prevState) => prevState + 1)
+    }, 1000)
+  }
+
+  const updateUserHandler = () => {
+    setUser({
+      ...user,
+      name: '猪八戒',
+      age: 28,
+    })
+  }
+
+  return (
+    <div className="app">
+      <div className="count">
+        {count} {user.name} {user.age}
+      </div>
+      <div>
+        <button onClick={subHandler}>-</button>
+        <button onClick={addHandler}>+</button>
+        <button onClick={updateUserHandler}>按钮</button>
+      </div>
+    </div>
+  )
 }
 
 export default App
