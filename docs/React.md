@@ -671,3 +671,444 @@ const App = () => {
 
 export default App
 ```
+
+## DOM 对象和 useRef
+
+获取原生的 DOM 对象
+
+- 可以使用传统的 document 来对 DOM 进行操作
+- 直接从 React 获取 DOM 对象
+  - 步骤：
+    - 创建一个存储 DOM 对象的容器，使用 useRef() 钩子函数
+    - 钩子函数的注意事项：
+      - React 中的钩子函数只能用于函数组件或自定义钩子
+      - 钩子函数只能直接在函数组件中调用
+    - 将容器设置为想要获取 DOM 对象元素的 ref 属性
+    - React 会自动将当前元素的 DOM 对象，设置为容器的 current 属性
+
+`useRef()`
+
+- 返回的就是一个普通的 JS 对象：`{current: undefined}`
+- 所以我们直接创建一个 js 对象，也可以代替 useRef()
+- 区别：
+  - 我们创建的对象，组件每次重新渲染都会创建一个新对象
+  - useRef()创建的对象，可以确保每次渲染获取到的都是同一个对象
+- 当你需要一个对象不会因为组件的重新渲染而改变时，就可以使用 useRef()
+
+```js
+import { useRef, useState } from 'react'
+import './App.css'
+
+const App = () => {
+  const [count, setCount] = useState(1)
+
+  const h1Ref = useRef()
+
+  const subHandler = () => {
+    setCount(count - 1)
+  }
+
+  const addHandler = () => {
+    setCount((prevState) => prevState + 1)
+  }
+
+  const clickHandler = () => {
+    // console.log(h1Ref.current)
+    h1Ref.current.innerText = '哈哈'
+  }
+
+  return (
+    <div className="app">
+      <h1 ref={h1Ref}>我是标题一</h1>
+      <div className="count">{count}</div>
+      <div>
+        <button onClick={subHandler}>-</button>
+        <button onClick={addHandler}>+</button>
+        <button onClick={clickHandler}>按钮</button>
+      </div>
+    </div>
+  )
+}
+
+export default App
+```
+
+## 类组件
+
+类组件的 props 是存储到类的实例对象中，可以直接通过实例对象访问，this.props
+
+类组件中 state 统一存储到了实例对象的 state 属性中，可以通过 this.state 来访问，通过 this.setState()对其进行修改，当我们通过 this.setState()修改 state 时，React 只会修改设置了的属性
+
+函数组件中，响应函数直接以函数的形式定义在组件中，但是在类组件中，响应函数是以类的方法来定义的，之前的属性都会保留，但是这仅限于直接存储于 state 中的属性
+
+获取 DOM 对象
+
+- 创建一个属性，用来存储 DOM 对象：`h2Ref = React.createRef()`
+- 将这个属性设置为指定元素的 ref 值
+
+**注意：为了省事，在类组件中响应函数都应该以箭头函数的形式定义**
+
+**父组件**
+
+```js
+import React from 'react'
+import User from './components/User'
+import './App.css'
+
+class App extends React.Component {
+  render() {
+    return (
+      <div className="app">
+        <User name={'孙悟空'} age={18} gender={'男'} />
+      </div>
+    )
+  }
+}
+
+export default App
+```
+
+**子组件**
+
+```js
+import React from 'react'
+
+class User extends React.Component {
+  state = {
+    count: 0,
+    test: '哈哈',
+    obj: {
+      name: '猪八戒',
+      age: 28,
+    },
+  }
+
+  h2Ref = React.createRef()
+
+  addHandler = () => {
+    this.setState((prevState) => {
+      return {
+        count: prevState.count + 1,
+        obj: {
+          ...this.state.obj,
+          name: '沙和尚',
+        },
+      }
+    })
+  }
+
+  render() {
+    return (
+      <div className="user">
+        <h2 ref={this.h2Ref}>
+          {this.state.count} {this.state.test} {this.state.obj.name} {this.state.obj.age}
+        </h2>
+        <button onClick={this.addHandler}>点我一下</button>
+        <ul>
+          <li>姓名：{this.props.name}</li>
+          <li>年龄：{this.props.age}</li>
+          <li>性别：{this.props.gender}</li>
+        </ul>
+      </div>
+    )
+  }
+}
+
+export default User
+```
+
+## 添加 Card 组件
+
+props.children 表示组件的标签体
+
+**父组件**
+
+```js
+import Card from '../../Card/Card'
+import './LogItem.css'
+import MyDate from './MyDate/MyDate'
+
+const LogItem = (props) => {
+  return (
+    <Card className="item">
+      <MyDate date={props.date} />
+      <div className="content">
+        <div className="subject">{props.subject}</div>
+        <div className="time">{props.time}分钟</div>
+      </div>
+    </Card>
+  )
+}
+
+export default LogItem
+```
+
+**子组件**
+
+```js
+import './Card.css'
+
+const Card = (props) => {
+  return <div className={`card ${props.className}`}>{props.children}</div>
+}
+
+export default Card
+```
+
+## 获取表单数据
+
+在 React 中，通常表单不需要自行提交，而是要通过 React 提交
+
+事件对象中保存了当前事件触发时的所有信息，e.target 指向的是触发事件的对象(DOM 对象)
+
+```js
+import Card from '../Card/Card'
+import './LogForm.css'
+
+const LogForm = () => {
+  const formData = {
+    date: '',
+    content: '',
+    time: 0,
+  }
+
+  const dateChangeHandler = (e) => {
+    formData.date = e.target.value
+  }
+
+  const contentInputHandler = (e) => {
+    formData.content = e.target.value
+  }
+
+  const timeInputHandler = (e) => {
+    formData.time = +e.target.value
+  }
+
+  const addHandler = () => {
+    console.log(formData)
+  }
+
+  return (
+    <Card className="log-form">
+      <form>
+        <div className="form-item">
+          <label htmlFor="date">日期：</label>
+          <input onChange={dateChangeHandler} id="date" type="date" />
+        </div>
+        <div className="form-item">
+          <label htmlFor="content">内容：</label>
+          <input onInput={contentInputHandler} id="content" type="text" />
+        </div>
+        <div className="form-item">
+          <label htmlFor="time">时长：</label>
+          <input onInput={timeInputHandler} id="time" type="text" />
+        </div>
+        <div className="form-item">
+          <button onClick={addHandler} type="button" className="add-btn">
+            添加
+          </button>
+        </div>
+      </form>
+    </Card>
+  )
+}
+
+export default LogForm
+```
+
+## 双向绑定
+
+提交表单后如何清空表单中的旧数据，现在这种表单，在 React 我们称为非受控组件
+
+我们可以将表单中的数据存储到 state 中，然后将 state 设置为表单项的 value 值，这样当表单项发生变化，state 会随之变化，反之，state 发生变化，表单项也会跟着改变，这种操作我们就称为双向绑定，这样一来，表单就成为了一个受控组件
+
+```js
+import { useState } from 'react'
+import Card from '../Card/Card'
+import './LogForm.css'
+
+const LogForm = () => {
+  const [formData, setFormData] = useState({
+    date: '',
+    content: '',
+    time: '',
+  })
+
+  const dateChangeHandler = (e) => {
+    setFormData({
+      ...formData,
+      date: e.target.value,
+    })
+  }
+
+  const contentInputHandler = (e) => {
+    setFormData({
+      ...formData,
+      content: e.target.value,
+    })
+  }
+
+  const timeInputHandler = (e) => {
+    setFormData({
+      ...formData,
+      time: +e.target.value,
+    })
+  }
+
+  const addHandler = () => {
+    console.log(formData)
+    setFormData({
+      date: '',
+      content: '',
+      time: '',
+    })
+  }
+
+  return (
+    <Card className="log-form">
+      <form>
+        <div className="form-item">
+          <label htmlFor="date">日期：</label>
+          <input onChange={dateChangeHandler} value={formData.date} id="date" type="date" />
+        </div>
+        <div className="form-item">
+          <label htmlFor="content">内容：</label>
+          <input onInput={contentInputHandler} value={formData.content} id="content" type="text" />
+        </div>
+        <div className="form-item">
+          <label htmlFor="time">时长：</label>
+          <input onInput={timeInputHandler} value={formData.time} id="time" type="text" />
+        </div>
+        <div className="form-item">
+          <button onClick={addHandler} type="button" className="add-btn">
+            添加
+          </button>
+        </div>
+      </form>
+    </Card>
+  )
+}
+
+export default LogForm
+```
+
+## 添加新日志
+
+**父组件**
+
+```js
+import Log from './components/Log/Log'
+import LogForm from './components/LogForm/LogForm'
+import './App.css'
+import { useState } from 'react'
+
+const App = () => {
+  const [logData, setLogData] = useState([
+    {
+      id: 1,
+      date: new Date(2024, 0, 26),
+      subject: '学习React',
+      time: 40,
+    },
+    {
+      id: 2,
+      date: new Date(2024, 0, 27),
+      subject: '学习Vue',
+      time: 50,
+    },
+    {
+      id: 3,
+      date: new Date(2024, 0, 28),
+      subject: '学习JavaScript',
+      time: 60,
+    },
+  ])
+
+  const addLogHandler = (newLog) => {
+    newLog.id = Date.now()
+    newLog.date = new Date(newLog.date)
+    setLogData([newLog, ...logData])
+  }
+
+  return (
+    <div className="app">
+      <LogForm onAdd={addLogHandler} />
+      <Log logData={logData} />
+    </div>
+  )
+}
+
+export default App
+```
+
+**子组件**
+
+```js
+import { useState } from 'react'
+import Card from '../Card/Card'
+import './LogForm.css'
+
+const LogForm = (props) => {
+  const [formData, setFormData] = useState({
+    date: '',
+    subject: '',
+    time: '',
+  })
+
+  const dateChangeHandler = (e) => {
+    setFormData({
+      ...formData,
+      date: e.target.value,
+    })
+  }
+
+  const contentInputHandler = (e) => {
+    setFormData({
+      ...formData,
+      subject: e.target.value,
+    })
+  }
+
+  const timeInputHandler = (e) => {
+    setFormData({
+      ...formData,
+      time: +e.target.value,
+    })
+  }
+
+  const addHandler = () => {
+    props.onAdd(formData)
+    setFormData({
+      date: '',
+      subject: '',
+      time: '',
+    })
+  }
+
+  return (
+    <Card className="log-form">
+      <form>
+        <div className="form-item">
+          <label htmlFor="date">日期：</label>
+          <input onChange={dateChangeHandler} value={formData.date} id="date" type="date" />
+        </div>
+        <div className="form-item">
+          <label htmlFor="subject">内容：</label>
+          <input onInput={contentInputHandler} value={formData.subject} id="subject" type="text" />
+        </div>
+        <div className="form-item">
+          <label htmlFor="time">时长：</label>
+          <input onInput={timeInputHandler} value={formData.time} id="time" type="text" />
+        </div>
+        <div className="form-item">
+          <button onClick={addHandler} type="button" className="add-btn">
+            添加
+          </button>
+        </div>
+      </form>
+    </Card>
+  )
+}
+
+export default LogForm
+```
