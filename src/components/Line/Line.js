@@ -1,4 +1,4 @@
-import classes from './styles.module.css'
+import classes from './Line.module.css'
 
 const Line = (props) => {
   return (

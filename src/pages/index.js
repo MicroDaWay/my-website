@@ -1,6 +1,6 @@
 import Layout from '@theme/Layout'
 import classes from './index.module.css'
-import Line from '../components/Line'
+import Line from '../components/Line/Line'
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
             <div>姓名：刘尉伟</div>
             <div>性别：男</div>
             <div>年龄：23</div>
-            <div>求职岗位：前端工程师</div>
+            <div>求职岗位：前端开发工程师</div>
           </div>
           <div className={classes.right}>
             <div>手机号：180xxxxxxxx</div>
@@ -28,7 +28,7 @@ export default function Home() {
         <div>通过英语四级、英语六级</div>
         <Line title="专业技能" />
         <ol className={classes.skills}>
-          <li>熟练掌握 HTML+CSS，熟练掌握弹性布局，能够快速实现Web端和移动端页面搭建</li>
+          <li>熟练掌握 HTML和CSS，熟练掌握弹性布局，能够快速实现Web端和移动端页面搭建</li>
           <li>熟练掌握 JavaScript，理解原型，闭包，异步等概念，熟练掌握 ES6+ 语法</li>
           <li>
             熟悉 Node.js 和常用模块，在此基础上能够使用 Express

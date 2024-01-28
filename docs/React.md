@@ -1112,3 +1112,167 @@ const LogForm = (props) => {
 
 export default LogForm
 ```
+
+## 空列表提示
+
+```js
+import LogItem from './LogItem/LogItem'
+import './Log.css'
+import Card from '../Card/Card'
+
+const Log = (props) => {
+  let newLogData = props.logData.map((item) => (
+    <LogItem
+      date={item.date}
+      subject={item.subject}
+      time={item.time}
+      key={item.id}
+      id={item.id}
+      onDelete={props.onDelete}
+    />
+    // <LogItem {...item} key={item.id} />
+  ))
+
+  if (!newLogData.length) {
+    newLogData = <div className="no-log">暂无日志</div>
+  }
+
+  return <Card className="container">{newLogData}</Card>
+}
+
+export default Log
+```
+
+## 使用 portal 修改项目
+
+portal
+
+- 组件默认会作为父组件的后代渲染到页面中，但是有些情况下，这种方式会带来一些问题
+- 通过 portal 可以将组件渲染到页面中的指定位置
+- 使用方法：
+  - 在 index.html 中添加一个新的元素
+  - 修改组件的渲染方式
+    - 通过 ReactDOM.createPortal()作为返回值创建元素
+    - 参数：
+      - jsx（修改前 return 后的代码）
+      - 目标位置（DOM 元素）
+
+**index.html**
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>学习日志</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="backdrop-root"></div>
+  </body>
+</html>
+```
+
+**BackDrop.js**
+
+```js
+import './BackDrop.css'
+import ReactDOM from 'react-dom'
+
+const backdropRoot = document.getElementById('backdrop-root')
+
+const BackDrop = (props) => {
+  return ReactDOM.createPortal(<div className="back-drop">{props.children}</div>, backdropRoot)
+}
+
+export default BackDrop
+```
+
+## 使用 create-react-app
+
+自动创建项目：`npx create-react-app 项目名`
+
+## 内联样式和样式表
+
+```js
+import { useState } from 'react'
+import './App.css'
+
+const App = () => {
+  const [redBorder, setRedBorder] = useState(true)
+
+  const pStyle = {
+    border: redBorder ? '2px solid red' : '2px solid blue',
+  }
+
+  const clickHandler = () => {
+    setRedBorder((prevState) => !prevState)
+  }
+
+  return (
+    <div>
+      <p style={pStyle} className="p1">
+        我是一个段落
+      </p>
+      <button onClick={clickHandler}>点我切换</button>
+    </div>
+  )
+}
+
+export default App
+```
+
+## CSS Module
+
+CSS 模块使用步骤：
+
+- 创建一个 xxx.module.css
+- 在组件中引入 CSS：`import classes from './App.module.css'`
+- 通过 classes 来设置类：`className={classes.p1}`
+- CSS 模块可以动态的设置唯一的 class 值：`App_p1__qKYtQ`
+
+```js
+import A from './A'
+import classes from './App.module.css'
+
+const App = () => {
+  return (
+    <div>
+      <p className={classes.p1}>我是一个段落</p>
+      <A />
+    </div>
+  )
+}
+
+export default App
+```
+
+## Fragment
+
+React.Fragment
+
+- 是一个专门用来作为父容器的组件，它只会将它里边的子元素直接返回，不会创建任何多余的元素
+- 当我们希望有一个父容器，但同时又不希望父容器在网页中产生多余的结构时，就可以使用 Fragment
+
+```js
+import React from 'react'
+
+const App = () => {
+  return (
+    // <React.Fragment>
+    //   <div>A组件</div>
+    //   <div>B组件</div>
+    //   <div>C组件</div>
+    // </React.Fragment>
+
+    <>
+      <div>A组件</div>
+      <div>B组件</div>
+      <div>C组件</div>
+    </>
+  )
+}
+
+export default App
+```
