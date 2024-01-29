@@ -136,7 +136,7 @@ React 就是用来代替 DOM 的
 
 - 用来将 React 元素渲染到根元素中
 - 根元素中所有的内容都会被删除，被 React 元素所替换
-- 当重复调用 render()时，React 会将两次的渲染结果进行比较，它会确保只修改那些发生变化的元素，对 DOM 做最少的修改
+- 当重复调用 render() 时，React 会将两次的渲染结果进行比较，它会确保只修改那些发生变化的元素，对 DOM 做最少的修改
 
 ```html
 <!DOCTYPE html>
@@ -178,7 +178,7 @@ React 就是用来代替 DOM 的
 
 ## JSX 简介
 
-声明式编程，结果导向的编程，在 React 中可以通过 JSX(JS 扩展)来创建 React 元素，JSX 需要被翻译为 JS 代码，才能被 React 执行，要在 React 中使用 JSX，必须引入 babel 来完成翻译工作，JSX 就是 React.createElement()的语法糖，JSX 在执行之前都会被 babel 转换为 js 代码
+声明式编程，结果导向的编程，在 React 中可以通过 JSX(JS 扩展)来创建 React 元素，JSX 需要被翻译为 JS 代码，才能被 React 执行，要在 React 中使用 JSX，必须引入 babel 来完成翻译工作，JSX 就是 React.createElement() 的语法糖，JSX 在执行之前都会被 babel 转换为 js 代码
 
 ```html
 <!DOCTYPE html>
@@ -328,7 +328,7 @@ React 就是用来代替 DOM 的
 - 解决兼容问题
 - 提升性能(减少 DOM 的不必要操作)
 
-每当我们调用 root.render()时，页面就会发生重新渲染，React 会通过 diffing 算法，将新的元素和旧的元素进行比较，通过比较找到发生变化的元素，并且只对变化的元素进行修改，没有发生变化的不予处理
+每当我们调用 root.render() 时，页面就会发生重新渲染，React 会通过 diffing 算法，将新的元素和旧的元素进行比较，通过比较找到发生变化的元素，并且只对变化的元素进行修改，没有发生变化的不予处理
 
 比较两次数据时，React 会先比较父元素，父元素如果不同，直接替换所有元素，父元素一致，再去逐个比较子元素，直到找到所有发生变化的元素为止，上例中，新旧两组数据完全一致，所以没有任何 DOM 对象被修改
 
@@ -466,7 +466,7 @@ export default App
 
 类组件必须要继承 React.Component，相较于函数组件，类组件的编写要麻烦一下，但是他俩的功能是一样的
 
-类组件中，必须添加一个 render()方法，且方法的返回值要是一个 jsx
+类组件中，必须添加一个 render() 方法，且方法的返回值要是一个 jsx
 
 ```js
 import React from 'react'
@@ -615,12 +615,12 @@ export default App
 
 ## state 的注意事项
 
-- state 实际就是一个被 React 管理的变量，当我们通过 setState()修改变量的值时，会触发组件的自动重新渲染
+- state 实际就是一个被 React 管理的变量，当我们通过 setState() 修改变量的值时，会触发组件的自动重新渲染
 - 只有 state 值发生变化时，组件才会重新渲染
 - 当 state 的值是一个对象时，修改时是使用新的对象去替换已有对象
 - 当通过 setState 去修改一个 state 时，并不表示修改当前的 state，它修改的是组件下一次渲染时的 state 值
-- setState()会触发组件的重新渲染，它是异步的，所以当调用 setState()需要用旧 state 的值时，一定要注意，有可能出现计算错误的情况，为了避免这种情况，可以通过为 setState()传递回调函数的形式来修改 state 值
-- setState()中回调函数的返回值将会成为新的 state 值，回调函数执行时，React 会将最新的 state 值作为参数传递
+- setState() 会触发组件的重新渲染，它是异步的，所以当调用 setState() 需要用旧 state 的值时，一定要注意，有可能出现计算错误的情况，为了避免这种情况，可以通过为 setState() 传递回调函数的形式来修改 state 值
+- setState() 中回调函数的返回值将会成为新的 state 值，回调函数执行时，React 会将最新的 state 值作为参数传递
 
 ```js
 import { useState } from 'react'
@@ -692,7 +692,7 @@ export default App
 - 所以我们直接创建一个 js 对象，也可以代替 useRef()
 - 区别：
   - 我们创建的对象，组件每次重新渲染都会创建一个新对象
-  - useRef()创建的对象，可以确保每次渲染获取到的都是同一个对象
+  - useRef() 创建的对象，可以确保每次渲染获取到的都是同一个对象
 - 当你需要一个对象不会因为组件的重新渲染而改变时，就可以使用 useRef()
 
 ```js
@@ -737,7 +737,7 @@ export default App
 
 类组件的 props 是存储到类的实例对象中，可以直接通过实例对象访问，this.props
 
-类组件中 state 统一存储到了实例对象的 state 属性中，可以通过 this.state 来访问，通过 this.setState()对其进行修改，当我们通过 this.setState()修改 state 时，React 只会修改设置了的属性
+类组件中 state 统一存储到了实例对象的 state 属性中，可以通过 this.state 来访问，通过 this.setState() 对其进行修改，当我们通过 this.setState() 修改 state 时，React 只会修改设置了的属性
 
 函数组件中，响应函数直接以函数的形式定义在组件中，但是在类组件中，响应函数是以类的方法来定义的，之前的属性都会保留，但是这仅限于直接存储于 state 中的属性
 
@@ -1152,7 +1152,7 @@ portal
 - 使用方法：
   - 在 index.html 中添加一个新的元素
   - 修改组件的渲染方式
-    - 通过 ReactDOM.createPortal()作为返回值创建元素
+    - 通过 ReactDOM.createPortal() 作为返回值创建元素
     - 参数：
       - jsx（修改前 return 后的代码）
       - 目标位置（DOM 元素）
@@ -1270,6 +1270,129 @@ const App = () => {
       <div>A组件</div>
       <div>B组件</div>
       <div>C组件</div>
+    </>
+  )
+}
+
+export default App
+```
+
+## 引入 FontAwesome
+
+文档：https://fontawesome.com/docs/web/use-with/react/
+
+```js
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import classes from './Counter.module.css'
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+
+const Counter = () => {
+  return (
+    <div className={classes.counter}>
+      <button className={classes.sub}>
+        <FontAwesomeIcon icon={faMinus} />
+      </button>
+      <span className={classes.count}>1</span>
+      <button className={classes.add}>
+        <FontAwesomeIcon icon={faPlus} />
+      </button>
+    </div>
+  )
+}
+
+export default Counter
+```
+
+## Context 的使用
+
+Context 相当于一个公共的存储空间，我们可以将多个组件中都需要访问的数据统一存储到一个 Context 中，这样无需通过 props 逐层传递，即可使组件访问到这些数据，通过 `React.createContext()` 创建 Context
+
+使用方式一：
+
+- 引入 Context
+- 使用 Xxx.Consumer 组件来创建元素，Consumer 的标签体需要一个回调函数，它会将 Context 设置为回调函数的参数，通过参数就可以访问到 Context 中存储的数据
+
+使用 Context 方式二：
+
+- 导入 Context
+- 使用钩子函数 useContext() 获取到 Context，useContext() 需要一个 Context 作为参数，它会获取 Context 中的数据并作为返回值返回
+
+Xxx.Provider
+
+- 表示数据的生产者，可以使用它来指定 Context 中的数据
+- 通过 value 来指定 Context 中存储的数据，这样一来，在该组件的所有子组件中都可以通过 Context 来访问它所指定的数据
+- 当我们通过 Context 访问数据时，它会读取离它最近的 Provider 中的数据，如果没有 Provider，则读取 Context 中的默认数据
+
+**TestContext.js**
+
+```js
+import React from 'react'
+
+const TestContext = React.createContext({
+  name: '孙悟空',
+  age: 18,
+})
+
+export default TestContext
+```
+
+**使用方式一 A.js**
+
+```js
+import TestContext from '../../store/TestContext'
+
+const A = () => {
+  return (
+    <TestContext.Consumer>
+      {(ctx) => {
+        return (
+          <div>
+            {ctx.name} {ctx.age}
+          </div>
+        )
+      }}
+    </TestContext.Consumer>
+  )
+}
+
+export default A
+```
+
+**使用方式二 B.js**
+
+```js
+import { useContext } from 'react'
+import TestContext from '../../store/TestContext'
+
+const B = () => {
+  const testCtx = useContext(TestContext)
+
+  return (
+    <div>
+      {testCtx.name} {testCtx.age}
+    </div>
+  )
+}
+
+export default B
+```
+
+**Provider**
+
+```js
+import A from './components/Test/A'
+import B from './components/Test/B'
+import TestContext from './store/TestContext'
+
+const App = () => {
+  return (
+    <>
+      <TestContext.Provider value={{ name: '猪八戒', age: 28 }}>
+        <A />
+      </TestContext.Provider>
+      <TestContext.Provider value={{ name: '沙和尚', age: 38 }}>
+        <B />
+      </TestContext.Provider>
     </>
   )
 }
