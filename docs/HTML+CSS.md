@@ -4726,7 +4726,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
       }
 
       body {
-        font-size: 16px;
+        font-size: 32rem;
       }
 
       .box01 {

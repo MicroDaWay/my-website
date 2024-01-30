@@ -1152,7 +1152,7 @@ portal
 - 使用方法：
   - 在 index.html 中添加一个新的元素
   - 修改组件的渲染方式
-    - 通过 ReactDOM.createPortal() 作为返回值创建元素
+    - 通过 `ReactDOM.createPortal()` 作为返回值创建元素
     - 参数：
       - jsx（修改前 return 后的代码）
       - 目标位置（DOM 元素）
