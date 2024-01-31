@@ -1399,3 +1399,254 @@ const App = () => {
 
 export default App
 ```
+
+## setState 的执行流程
+
+Too many re-renders
+
+- 当我们直接在函数体中调用 setState 时，就会触发上述错误
+- 问题：不是说过，当新的 state 值和旧值相同时，它是不会触发组件的重新渲染的
+- setState() 的执行流程（函数组件）
+  - setCount() --> dispatchSetDate()
+  - 会先判断，组件当前处于什么阶段，如果是渲染阶段，不会检查 state 值是否相同
+  - 如果不是渲染阶段，会检查 state 的值是否相同
+    - 如果值不相同，则对组件进行重新渲染，如果值相同，则不对组件进行重新渲染
+    - 如果值相同，React 在一些情况下会继续执行当前组件的渲染，但是这个渲染不会触发其子组件的渲染，这次渲染不会产生实际的效果，这种情况通常发生在值第一次相同时
+
+**App.js**
+
+```js
+import React, { useState } from 'react'
+import A from './Components/A'
+
+const App = () => {
+  console.log('App组件渲染了')
+  const [count, setCount] = useState(0)
+  const clickHandler = () => {
+    setCount(1)
+  }
+
+  return (
+    <div>
+      <div>{count}</div>
+      <button onClick={clickHandler}>点我一下</button>
+      <A />
+    </div>
+  )
+}
+
+export default App
+```
+
+**A.js**
+
+```js
+const A = () => {
+  console.log('A组件渲染了')
+
+  return <div>A组件</div>
+}
+
+export default A
+```
+
+## useEffect 简介
+
+useEffect()是一个钩子函数，需要一个函数作为参数，这个作为参数的函数，将会在组件渲染完毕后执行，在开发中，可以将那些会产生副作用的代码编写到 useEffect 的回调函数中，这样就可以避免这些代码影响到组件的渲染
+
+```js
+import React, { useEffect, useState } from 'react'
+import A from './Components/A'
+
+const App = () => {
+  console.log('App组件渲染了')
+  const [count, setCount] = useState(0)
+  const clickHandler = () => {
+    setCount(1)
+  }
+
+  // setTimeout(() => {
+  //   setCount(1)
+  // })
+
+  useEffect(() => {
+    setCount(1)
+  })
+
+  return (
+    <div>
+      <div>{count}</div>
+      <button onClick={clickHandler}>点我一下</button>
+      <A />
+    </div>
+  )
+}
+
+export default App
+```
+
+## useEffect 的依赖项
+
+默认情况下，useEffect() 中的函数，会在组件渲染完成后调用，并且是每次渲染完成后都会调用
+
+在 useEffect()中可以传递第二个参数，第二个参数是一个数组，在数组中可以指定 useEffect 的依赖项，指定后，只有当依赖发生变化时，useEffect 才会被触发，通常会将 useEffect 中使用的所有局部变量都设置为依赖项，这样一来可以确保这些值发生变化时，会触发 useEffect 的执行，像 setState()是由钩子函数 useState()生成的，useState()会确保组件的每次渲染都会获取到相同 setState()对象，所以 setState()方法可以不设置到依赖中，如果依赖项设置了一个空数组，则意味着 useEffect 只会在组件初始化时触发一次
+
+```js
+import classes from './BottomBar.module.css'
+import Bag from '../../assets/bag.png'
+import { useContext, useEffect, useState } from 'react'
+import CartContext from '../../store/CartContext'
+import CartDetails from '../CartDetails/CartDetails'
+
+const BottomBar = (props) => {
+  // 是否显示购物车详情
+  const [showCartDetails, setShowCartDetails] = useState(false)
+  const cartContext = useContext(CartContext)
+
+  // 是否显示购物车详情
+  const clickBottomBar = () => {
+    if (!cartContext.totalAmount) {
+      setShowCartDetails(false)
+      return
+    }
+    setShowCartDetails((prevState) => !prevState)
+  }
+
+  // 点击去结算的处理函数
+  const checkoutHandler = (e) => {
+    e.stopPropagation()
+    if (cartContext.totalAmount) {
+      props.onShowCheckout()
+    }
+  }
+
+  useEffect(() => {
+    if (cartContext.totalAmount === 0) {
+      setShowCartDetails(false)
+    }
+  }, [cartContext])
+
+  return (
+    <div onClick={clickBottomBar} className={classes['bottom-bar']}>
+      <div className={classes['bag-box']}>
+        <img src={Bag} alt="bag" />
+        {cartContext.totalAmount ? (
+          <div className={classes['total-amount-box']}>{cartContext.totalAmount}</div>
+        ) : null}
+      </div>
+      {cartContext.totalPrice ? (
+        <div className={classes['total-price']}>{cartContext.totalPrice}</div>
+      ) : (
+        <div className={classes['no-meal']}>未选购商品</div>
+      )}
+      <div
+        onClick={checkoutHandler}
+        className={cartContext.totalPrice ? classes['checkout'] : classes['no-checkout']}
+      >
+        去结算
+      </div>
+      {showCartDetails ? <CartDetails /> : null}
+    </div>
+  )
+}
+
+export default BottomBar
+```
+
+## useEffect 的清理函数
+
+在 useEffect 的回调函数中，可以指定一个函数作为返回值，这个函数可以称其为清理函数，它会在下次 useEffect 执行前调用，可以在这个函数中，做一些工作来清除上次 useEffect 执行所带来的影响
+
+```js
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import classes from './Search.module.css'
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
+import { useEffect, useState } from 'react'
+
+const Search = (props) => {
+  const [keyword, setKeyword] = useState('')
+
+  // input输入框输入的处理函数
+  const inputHandler = (e) => {
+    setKeyword(e.target.value.trim())
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      props.onFilter(keyword)
+    }, 1000)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [keyword])
+
+  return (
+    <div className={classes.search}>
+      <FontAwesomeIcon icon={faMagnifyingGlass} className={classes['search-icon']} />
+      <input
+        value={keyword}
+        onInput={inputHandler}
+        className={classes['search-input']}
+        type="text"
+        placeholder="请输入关键字"
+      />
+    </div>
+  )
+}
+
+export default Search
+```
+
+## useReducer
+
+- 参数：
+  - reducer 整合函数
+    - 对于当前 state 的所有操作都应该在该函数中定义，该函数的返回值会成为 state 的新值
+    - reducer 在执行时会收到两个参数：
+      - state 当前最新的 state
+      - action 它需要一个对象，在对象中会存储 dispatch 所发送的指令
+  - initialArg
+    - state 的初始值，作用和 useState() 中的值是一样的
+- 返回值：
+  - 返回值是一个数组
+  - 数组中的第一个值为 state：用来获取 state 的值
+  - 数组中的第二个值为修改 state 的派发器，通过派发器可以发送操作 state 的命令，具体的修改行为将会由另外一个函数 reducer 执行
+  - 为了避免 reducer 会重复创建，通常 reducer 会定义到组件的外部
+
+```js
+import { useReducer } from 'react'
+
+const countReducer = (state, action) => {
+  switch (action.type) {
+    case 'SUB':
+      return state - 1
+    case 'ADD':
+      return state + 1
+    default:
+      return state
+  }
+}
+
+const App = () => {
+  const [count, countDispatch] = useReducer(countReducer, 1)
+
+  const subHandler = () => {
+    countDispatch({ type: 'SUB' })
+  }
+
+  const addHandler = () => {
+    countDispatch({ type: 'ADD' })
+  }
+
+  return (
+    <div>
+      <button onClick={subHandler}>减少</button>
+      <span>{count}</span>
+      <button onClick={addHandler}>增加</button>
+    </div>
+  )
+}
+
+export default App
+```
