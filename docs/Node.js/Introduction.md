@@ -196,16 +196,16 @@ promise.finally(() => {
     - 创建一个立即完成的 Promise
   - Promise.reject()
     - 创建一个立即拒绝的 Promise
-  - Promise.all([...])
-    - 同时返回多个 Promise 的执行结果
+  - Promise.all(数组)
+    - 同时返回多个 Promise 的执行结果，返回的是一个真数组
     - 其中有一个报错，就返回错误
-  - Promise.allSettled([...])
-    - 同时返回多个 Promise 的执行结果(无论成功或失败)
+  - Promise.allSettled(数组)
+    - 同时返回多个 Promise 的执行结果(无论成功或失败)，返回的是一个真数组，数组里面是对象
     - `{status: 'fulfilled', value: 579}`
     - `{status: 'rejected', reason: '哈哈'}`
-  - Promise.race([...])
+  - Promise.race(数组)
     - 返回执行最快的 Promise(不考虑对错)
-  - Promise.any([...])
+  - Promise.any(数组)
     - 返回执行最快的完成的 Promise
 
 ```js
