@@ -1154,8 +1154,8 @@ portal
   - 修改组件的渲染方式
     - 通过 `ReactDOM.createPortal()` 作为返回值创建元素
     - 参数：
-      - jsx（修改前 return 后的代码）
-      - 目标位置（DOM 元素）
+      - jsx(修改前 return 后的代码)
+      - 目标位置(DOM 元素)
 
 **index.html**
 
@@ -1406,7 +1406,7 @@ Too many re-renders
 
 - 当我们直接在函数体中调用 setState 时，就会触发上述错误
 - 问题：不是说过，当新的 state 值和旧值相同时，它是不会触发组件的重新渲染的
-- setState() 的执行流程（函数组件）
+- setState() 的执行流程(函数组件)
   - setCount() --> dispatchSetDate()
   - 会先判断，组件当前处于什么阶段，如果是渲染阶段，不会检查 state 值是否相同
   - 如果不是渲染阶段，会检查 state 的值是否相同
@@ -1644,6 +1644,196 @@ const App = () => {
       <button onClick={subHandler}>减少</button>
       <span>{count}</span>
       <button onClick={addHandler}>增加</button>
+    </div>
+  )
+}
+
+export default App
+```
+
+## React.memo
+
+`React.memo()`
+
+- 是一个高阶组件，它接收另一个组件作为参数，并且会返回一个包装过的新组件
+- 包装过的新组件具有缓存功能，包装过后，只有组件的 props 发生变化时才会触发组件的重新渲染，否则总是返回缓存中的结果
+
+**App.js**
+
+```js
+import { useState } from 'react'
+import A from './Components/A'
+
+const App = () => {
+  console.log('App组件')
+
+  const [count, setCount] = useState(1)
+
+  const addHandler = () => {
+    setCount((prevState) => prevState + 1)
+  }
+
+  return (
+    <div>
+      <div>
+        App组件 {count} <button onClick={addHandler}>点我一下</button>
+      </div>
+      <A />
+    </div>
+  )
+}
+
+export default App
+```
+
+**A.js**
+
+```js
+import { useState } from 'react'
+import B from './B'
+
+const A = () => {
+  console.log('A组件')
+
+  const [count, setCount] = useState(1)
+
+  const addHandler = () => {
+    setCount((prevState) => prevState + 1)
+  }
+
+  const flag = count % 5 === 0
+
+  return (
+    <div>
+      A组件 {count} <button onClick={addHandler}>点我一下</button>
+      <B flag={flag} />
+    </div>
+  )
+}
+
+export default A
+```
+
+**B.js**
+
+```js
+import React from 'react'
+
+const B = (props) => {
+  console.log('B组件')
+
+  return (
+    <div>
+      <div>B组件</div>
+      <div>{props.flag ? '哈哈' : null}</div>
+    </div>
+  )
+}
+
+export default React.memo(B)
+```
+
+## useCallback
+
+useCallback 是一个钩子函数，用来创建 React 中的回调函数
+
+useCallback 创建的回调函数不会总在组件重新渲染时重新创建
+
+参数：
+
+- 回调函数
+- 依赖数组
+  - 当依赖数组中的变量发生变化时，回调函数才会重新创建
+  - 如果不指定依赖数组，回调函数每次都会重新创建
+  - 一定要将回调函数中使用到的所有变量都设置到依赖数组中除了(setState)
+
+**App.js**
+
+```js
+import { useCallback, useState } from 'react'
+import A from './Components/A'
+
+const App = () => {
+  console.log('App组件')
+
+  const [count, setCount] = useState(1)
+  const [num, setNum] = useState(1)
+
+  const addHandler = useCallback(() => {
+    setCount((prevState) => prevState + num)
+    setNum((prevState) => prevState + 1)
+  }, [num])
+
+  return (
+    <div>
+      <div>
+        App组件 {count} <button onClick={addHandler}>点我一下</button>
+      </div>
+      <A onAdd={addHandler} />
+    </div>
+  )
+}
+
+export default App
+```
+
+**A.js**
+
+```js
+import { useState } from 'react'
+import React from 'react'
+import B from './B'
+
+const A = (props) => {
+  console.log('A组件')
+
+  const [count, setCount] = useState(1)
+
+  const addHandler = () => {
+    setCount((prevState) => prevState + 1)
+  }
+
+  const flag = count % 5 === 0
+
+  const clickHandler = () => {
+    props.onAdd()
+  }
+
+  return (
+    <div>
+      A组件 {count} <button onClick={addHandler}>点我一下</button>{' '}
+      <button onClick={clickHandler}>增加App组件</button>
+      <B flag={flag} />
+    </div>
+  )
+}
+
+export default React.memo(A)
+```
+
+## 使用 fetch
+
+```js
+import { useState } from 'react'
+import StudentList from './Components/StudentList/StudentList'
+import { useEffect } from 'react'
+
+const App = () => {
+  const [studentData, setStudentData] = useState([])
+
+  useEffect(() => {
+    fetch('http://localhost:1337/api/students')
+      .then((res) => {
+        return res.json()
+      })
+      .then((data) => {
+        setStudentData(data.data)
+      })
+  }, [])
+
+  return (
+    <div>
+      <StudentList studentData={studentData} />
     </div>
   )
 }

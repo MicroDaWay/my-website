@@ -122,7 +122,7 @@ console.log(222)
     - 用来存储数据
   - PromiseState
     - 记录 Promise 的状态(三种状态)
-      - pending (进行中)
+      - pending(进行中)
       - fulfilled(完成) 通过 resolve 存储数据时
       - rejected(拒绝，出错了) 出错了或通过 reject 存储数据时
     - **state 只能修改一次，修改以后永远不会再变**
@@ -136,13 +136,13 @@ console.log(222)
       - 如果 PromiseState 变为 fulfilled，则调用 then 的第一个回调函数来返回数据
       - 如果 PromiseState 变为 rejected，则调用 then 的第二个回调函数来返回数据
 - catch() 用法和 then 类似，但是只需要一个回调函数作为参数
-  - catch()中的回调函数只会在 Promise 被拒绝时才调用
+  - catch() 中的回调函数只会在 Promise 被拒绝时才调用
   - catch() 相当于 then(null, reason => {})
   - catch() 就是一个专门处理 Promise 异常的方法
 - finally()
   - 无论是正常存储数据还是出现异常了，finally 总会执行
   - 但是 finally 的回调函数中不会接收到数据
-  - finally()通常用来编写一些无论成功与否都要执行的代码
+  - finally() 通常用来编写一些无论成功与否都要执行的代码
 
 ```js
 const promise = new Promise((resolve, reject) => {
@@ -185,7 +185,7 @@ promise.finally(() => {
   - 如果上一步的执行结果不是当前想要的结果，则跳过当前的方法
 - 当 Promise 出现异常时，而整个调用链中没有出现 catch，则异常会向外抛出
 - promise 中的
-  - then (return new Promise())
+  - then(return new Promise())
   - catch
     - 这三个方法都会返回一个新的 Promise
     - Promise 中会存储回调函数的返回值
@@ -362,8 +362,8 @@ Promise.any([Promise.reject(111), Promise.reject(222), Promise.reject(333)])
     - 任务队列放的是将要执行的代码
     - 当调用栈中的代码执行完毕后，队列中的代码才会按照顺序依次进入到栈中执行
     - 在 JS 中任务队列有两种
-      - 宏任务队列 (大部分代码都去宏任务队列中排队)
-      - 微任务队列 (Promise 的回调函数(then、catch、finally))
+      - 宏任务队列(大部分代码都去宏任务队列中排队)
+      - 微任务队列(Promise 的回调函数(then、catch、finally))
     - 整个流程
       - 执行调用栈中的代码
       - 执行微任务队列中的所有任务
