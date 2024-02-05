@@ -1840,3 +1840,51 @@ const App = () => {
 
 export default App
 ```
+
+## 自定义钩子
+
+React 中的钩子函数只能在函数组件或自定义钩子中调用，当我们需要将 React 中的钩子函数提取到一个公共区域时，就可以使用自定义钩子
+
+自定义钩子其实就是一个普通函数，只是它的名字需要使用 use 开头
+
+```js
+import { useCallback, useState } from 'react'
+
+export const useFetch = () => {
+  // 学生数据
+  const [data, setData] = useState([])
+
+  // 是否正在加载
+  const [isLoading, setIsLoading] = useState(false)
+
+  // 是否出错
+  const [error, setError] = useState(null)
+
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      // 重置错误
+      setError(null)
+      const res = await fetch('http://localhost:1337/api/students')
+      if (res.ok) {
+        const data = await res.json()
+        setData(data.data)
+      } else {
+        throw new Error('数据加载失败')
+      }
+    } catch (err) {
+      setError(err.message)
+      console.log('出错了', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  return {
+    data,
+    isLoading,
+    error,
+    fetchData,
+  }
+}
+```
