@@ -4,7 +4,7 @@ sidebar_position: 12
 
 # React
 
-## Hello World
+## HelloWorld
 
 React 就是用来代替 DOM 的
 
@@ -1887,4 +1887,424 @@ export const useFetch = () => {
     fetchData,
   }
 }
+```
+
+## HelloRedux
+
+在网页中使用 Redux 的步骤：
+
+- 引入 Redux 核心包
+- 创建 reducer 整合函数
+- 通过 reducer 对象创建 store
+- 对 store 中的 state 进行订阅
+- 通过 dispatch 派发 state 的操作指令
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/redux@4.2.0/dist/redux.js"></script>
+  </head>
+  <body>
+    <button id="sub">减</button>
+    <span id="count">1</span>
+    <button id="add">加</button>
+
+    <script>
+      const countSpan = document.getElementById('count')
+      const sub = document.getElementById('sub')
+      const add = document.getElementById('add')
+
+      let count = 1
+
+      const reducer = (state, action) => {
+        switch (action.type) {
+          case 'ADD':
+            return state + 1
+          case 'SUB':
+            return state - 1
+          default:
+            return state
+        }
+      }
+
+      const store = Redux.createStore(reducer, 1)
+
+      store.subscribe(() => {
+        countSpan.innerText = store.getState()
+      })
+
+      add.addEventListener('click', () => {
+        store.dispatch({
+          type: 'ADD',
+        })
+      })
+
+      sub.addEventListener('click', () => {
+        store.dispatch({
+          type: 'SUB',
+        })
+      })
+    </script>
+  </body>
+</html>
+```
+
+## 解析 HelloRedux
+
+reducer 函数
+
+- state 表示当前 state，可以根据这个 state 生成新的 state
+- action 是一个 js 对象，它里边会保存操作的信息
+- type 表示操作的类型
+- 其他需要传递的参数，也可以在 action 中设置
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/redux@4.2.0/dist/redux.js"></script>
+  </head>
+  <body>
+    <button id="sub">减</button>
+    <span id="count">1</span>
+    <span id="swk">孙悟空</span>
+    <button id="add">加</button>
+    <button id="add-five">加5</button>
+
+    <script>
+      const countSpan = document.getElementById('count')
+      const nameSpan = document.getElementById('swk')
+      const sub = document.getElementById('sub')
+      const add = document.getElementById('add')
+      const addFive = document.getElementById('add-five')
+
+      let count = 1
+      let name = '孙悟空'
+
+      const reducer = (
+        state = {
+          count: 1,
+          name: '孙悟空',
+        },
+        action
+      ) => {
+        switch (action.type) {
+          case 'ADD':
+            return {
+              ...state,
+              count: state.count + 1,
+            }
+          case 'ADD_N':
+            return {
+              ...state,
+              count: state.count + action.payload,
+              name: '猪八戒',
+            }
+          case 'SUB':
+            return {
+              ...state,
+              count: state.count - 1,
+            }
+          default:
+            return {
+              ...state,
+              count: state.count,
+            }
+        }
+      }
+
+      const store = Redux.createStore(reducer)
+
+      store.subscribe(() => {
+        countSpan.innerText = store.getState().count
+        nameSpan.innerText = store.getState().name
+      })
+
+      add.addEventListener('click', () => {
+        store.dispatch({
+          type: 'ADD',
+        })
+      })
+
+      addFive.addEventListener('click', () => {
+        store.dispatch({
+          type: 'ADD_N',
+          payload: 5,
+        })
+      })
+
+      sub.addEventListener('click', () => {
+        store.dispatch({
+          type: 'SUB',
+        })
+      })
+    </script>
+  </body>
+</html>
+```
+
+## 使用 RTK 创建 store
+
+- 安装依赖：`npm i react-redux @reduxjs/toolkit`
+- createSlice
+  - 创建 reducer 的切片
+  - 它需要一个配置对象作为参数，通过对象的不同的属性来指定它的配置
+  - name：用来自动生成 action 中的 type 属性
+  - initialState：state 的初始值
+  - reducers：指定 state 的各种操作，直接在对象中添加方法
+- 注意：
+  - 切片对象会自动的帮助我们生成 action
+  - actions 中存储的是 slice 自动生成的 action 创建器（函数），调用函数后会自动创建 action 对象
+  - action 对象的结构 `{ type:name/函数名, payload:函数的参数 }`
+- configureStore
+  - 用来创建 store 对象，需要一个配置对象作为参数
+
+```js
+import { configureStore, createSlice } from '@reduxjs/toolkit'
+
+const studentSlice = createSlice({
+  name: 'student',
+  initialState: {
+    name: '孙悟空',
+    age: 18,
+    gender: '男',
+    address: '花果山',
+  },
+  reducers: {
+    setName(state, action) {
+      // 可以通过不同的方法来指定对state的不同操作
+      // 两个参数：state是一个代理对象，可以直接修改
+      state.name = '猪八戒'
+    },
+    setAge(state, action) {
+      state.age = 28
+    },
+  },
+})
+
+export const { setName, setAge } = studentSlice.actions
+
+const store = configureStore({
+  reducer: {
+    student: studentSlice.reducer,
+  },
+})
+
+export default store
+```
+
+## 完成 RTK 代码
+
+**index.js**
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import { Provider } from 'react-redux'
+import store from './store'
+
+const root = ReactDOM.createRoot(document.getElementById('root'))
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+)
+```
+
+**App.js**
+
+```js
+import { useDispatch, useSelector } from 'react-redux'
+import './store/index'
+import { setAge, setName } from './store/index'
+
+const App = () => {
+  const student = useSelector((state) => state.student)
+  const dispatch = useDispatch()
+
+  const updateName = () => {
+    dispatch(setName('沙和尚'))
+  }
+
+  const updateAge = () => {
+    dispatch(setAge(38))
+  }
+
+  return (
+    <div>
+      <div>
+        {student.name} {student.age} {student.gender} {student.address}
+      </div>
+      <button onClick={updateName}>修改name</button>
+      <button onClick={updateAge}>修改age</button>
+    </div>
+  )
+}
+
+export default App
+```
+
+**store/index.js**
+
+```js
+import { configureStore, createSlice } from '@reduxjs/toolkit'
+
+const studentSlice = createSlice({
+  name: 'student',
+  initialState: {
+    name: '孙悟空',
+    age: 18,
+    gender: '男',
+    address: '花果山',
+  },
+  reducers: {
+    setName(state, action) {
+      state.name = action.payload
+    },
+    setAge(state, action) {
+      state.age = action.payload
+    },
+  },
+})
+
+export const { setName, setAge } = studentSlice.actions
+
+const store = configureStore({
+  reducer: {
+    student: studentSlice.reducer,
+  },
+})
+
+export default store
+```
+
+## 拆分 RTK 代码
+
+**store/module/student.js**
+
+```js
+import { createSlice } from '@reduxjs/toolkit'
+
+const studentSlice = createSlice({
+  name: 'student',
+  initialState: {
+    name: '孙悟空',
+    age: 18,
+    gender: '男',
+    address: '花果山',
+  },
+  reducers: {
+    setName(state, action) {
+      state.name = action.payload
+    },
+    setAge(state, action) {
+      state.age = action.payload
+    },
+  },
+})
+
+export const { setName, setAge } = studentSlice.actions
+export const { reducer: studentReducer } = studentSlice
+```
+
+**store/module/school.js**
+
+```js
+import { createSlice } from '@reduxjs/toolkit'
+
+const schoolSlice = createSlice({
+  name: 'school',
+  initialState: {
+    name: '花果山小学',
+    address: '花果山大街1号',
+  },
+  reducers: {
+    setName(state, action) {
+      state.name = action.payload
+    },
+    setAddress(state, action) {
+      state.address = action.payload
+    },
+  },
+})
+
+export const { setName, setAddress } = schoolSlice.actions
+export const { reducer: schoolReducer } = schoolSlice
+```
+
+**store/index.js**
+
+```js
+import { configureStore } from '@reduxjs/toolkit'
+import { studentReducer } from './module/student'
+import { schoolReducer } from './module/school'
+
+const store = configureStore({
+  reducer: {
+    student: studentReducer,
+    school: schoolReducer,
+  },
+})
+
+export default store
+```
+
+**App.js**
+
+```js
+import { useDispatch, useSelector } from 'react-redux'
+import './store/index'
+import { setAge, setName } from './store/module/student'
+import { setName as setSchoolName, setAddress } from './store/module/school'
+
+const App = () => {
+  const student = useSelector((state) => state.student)
+  const school = useSelector((state) => state.school)
+
+  // const { student, school } = useSelector((state) => state)
+
+  const dispatch = useDispatch()
+
+  const updateName = () => {
+    dispatch(setName('沙和尚'))
+  }
+
+  const updateAge = () => {
+    dispatch(setAge(38))
+  }
+
+  const updateSchoolName = () => {
+    dispatch(setSchoolName('高老庄小学'))
+  }
+
+  const updateSchoolAddress = () => {
+    dispatch(setAddress('高老庄大街1号'))
+  }
+
+  return (
+    <div>
+      <div>
+        {student.name} {student.age} {student.gender} {student.address}
+      </div>
+      <button onClick={updateName}>修改name</button>
+      <button onClick={updateAge}>修改age</button>
+      <hr />
+      <div>
+        {school.name} {school.address}
+      </div>
+      <button onClick={updateSchoolName}>修改学校名字</button>
+      <button onClick={updateSchoolAddress}>修改学校地址</button>
+    </div>
+  )
+}
+
+export default App
 ```
