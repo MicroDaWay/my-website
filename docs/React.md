@@ -2308,3 +2308,121 @@ const App = () => {
 
 export default App
 ```
+
+## RTKQ 简介
+
+`createApi()`
+
+- 用来创建 RTKQ 中的 API 对象
+- RTKQ 的所有功能都需要通过该对象来进行
+- 需要一个对象作为参数
+- reducerPath
+  - Api 的标识，不能和其他的 Api 或 reducer 重复
+- baseQuery
+  - 指定查询的基础信息，发送请求使用的工具
+- endpoints
+  - 用来指定 Api 中的各种功能，是一个方法，需要一个对象作为返回值
+  - build 是请求的构建器，通过 build 来设置请求的相关信息
+
+```js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
+
+const studentApi = createApi({
+  reducerPath: 'studentApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:1337/api/',
+  }),
+  endpoints(build) {
+    return {
+      getAllStudent: build.query({
+        query() {
+          return 'students'
+        },
+      }),
+    }
+  },
+})
+```
+
+## HelloRTKQ
+
+**store/studentApi**
+
+```js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
+
+export const studentApi = createApi({
+  reducerPath: 'studentApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:1337/api/',
+  }),
+  endpoints(build) {
+    return {
+      getAllStudent: build.query({
+        query() {
+          return 'students'
+        },
+      }),
+    }
+  },
+})
+
+export const { useGetAllStudentQuery } = studentApi
+```
+
+**store/index.js**
+
+```js
+import { configureStore } from '@reduxjs/toolkit'
+import { studentApi } from './studentApi'
+
+const store = configureStore({
+  reducer: {
+    [studentApi.reducerPath]: studentApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(studentApi.middleware),
+})
+
+export default store
+```
+
+**index.js**
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { Provider } from 'react-redux'
+import App from './App'
+import store from './store'
+
+const root = ReactDOM.createRoot(document.getElementById('root'))
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+)
+```
+
+**App.js**
+
+```js
+import { useGetAllStudentQuery } from './store/studentApi'
+
+const App = () => {
+  const { data, isSuccess, isLoading } = useGetAllStudentQuery()
+  return (
+    <div>
+      {isLoading && <div>数据加载中...</div>}
+      {isSuccess &&
+        data.data.map((item) => (
+          <div key={item.id}>
+            {item.attributes.name}--{item.attributes.age}--{item.attributes.gender}--
+            {item.attributes.address}
+          </div>
+        ))}
+    </div>
+  )
+}
+
+export default App
+```
