@@ -2061,7 +2061,7 @@ reducer 函数
   - reducers：指定 state 的各种操作，直接在对象中添加方法
 - 注意：
   - 切片对象会自动的帮助我们生成 action
-  - actions 中存储的是 slice 自动生成的 action 创建器（函数），调用函数后会自动创建 action 对象
+  - actions 中存储的是 slice 自动生成的 action 创建器(函数)，调用函数后会自动创建 action 对象
   - action 对象的结构 `{ type:name/函数名, payload:函数的参数 }`
 - configureStore
   - 用来创建 store 对象，需要一个配置对象作为参数
@@ -2425,4 +2425,479 @@ const App = () => {
 }
 
 export default App
+```
+
+## 缓存演示
+
+`keepUnusedDataFor`：设置数据缓存的时间，单位是秒，默认为 60s
+
+```js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
+
+export const studentApi = createApi({
+  reducerPath: 'studentApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:1337/api/',
+  }),
+  endpoints(build) {
+    return {
+      getAllStudent: build.query({
+        query() {
+          return 'students'
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+      }),
+      getStudentById: build.query({
+        query(id) {
+          return `students/${id}`
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+        keepUnusedDataFor: 60,
+      }),
+    }
+  },
+})
+
+export const { useGetAllStudentQuery, useGetStudentByIdQuery } = studentApi
+```
+
+## useQuery 的返回值
+
+- currentData：当前参数的最新数据
+- data：最新的数据，与参数无关
+- isError：布尔值，是否有错误
+- error：对象，有错时才存在
+- isFetching：布尔值，数据是否在加载
+- isLoading：布尔值，数据是否第一次加载
+- isSuccess：布尔值，请求是否成功
+- isUninitialized：布尔值，请求是否还没有开始发送
+- refetch：一个函数，用来重新加载数据
+- status：字符串，请求的状态
+
+```js
+import { useGetAllStudentQuery } from './store/studentApi'
+import StudentList from './components/StudentList/StudentList'
+
+let num = 1
+
+const App = () => {
+  const { data, isSuccess, isLoading, refetch, currentData } = useGetAllStudentQuery(num)
+
+  console.log(data, currentData, data === currentData)
+
+  return (
+    <div>
+      <button onClick={refetch}>刷新</button>
+      <button onClick={() => num++}>num+1</button>
+      {isLoading && <div>数据加载中...</div>}
+      {isSuccess && <StudentList studentData={data} />}
+    </div>
+  )
+}
+
+export default App
+```
+
+## useQuery 的参数
+
+useQuery 可以接收一个对象作为第二个参数，通过该对象可以对请求进行配置
+
+- selectFromResult：用来指定 useQuery 返回的结果
+- pollingInterval：设置轮询的间隔，单位是毫秒，如果为 0 则表示不轮询
+- skip：设置是否跳过当前请求，默认为 false
+- refetchOnMountOrArgChange：设置是否每次都重新加载数据 false 表示正常使用缓存，true 表示每次都重新加载数据，也可以设置一个数字表示数据缓存的时间(秒)
+- refetchOnFocus：是否在重新获取焦点时重新加载数据
+- refetchOnReconnect：是否在重新连接网络后重新加载数据
+- setupListeners(store.dispatch)：设置以后将会支持 refetchOnFocus 和 refetchOnReconnect
+
+```js
+import StudentList from './components/StudentList/StudentList'
+import { useGetAllStudentQuery } from './store/studentApi'
+
+const App = () => {
+  const { data, isSuccess, isLoading, refetch } = useGetAllStudentQuery(null, {
+    // selectFromResult: (result) => {
+    //   if (result.data) {
+    //     result.data = result.data.filter((item) => item.attributes.age < 18)
+    //   }
+    //   return result
+    // },
+    pollingInterval: 0,
+    skip: false,
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  })
+
+  return (
+    <div>
+      <button onClick={refetch}>刷新</button>
+      {isLoading && <div>数据加载中...</div>}
+      {isSuccess && <StudentList studentData={data} />}
+    </div>
+  )
+}
+
+export default App
+```
+
+**store/index.js**
+
+```js
+import { configureStore } from '@reduxjs/toolkit'
+import { studentApi } from './studentApi'
+import { setupListeners } from '@reduxjs/toolkit/query'
+
+const store = configureStore({
+  reducer: {
+    [studentApi.reducerPath]: studentApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(studentApi.middleware),
+})
+
+setupListeners(store.dispatch)
+
+export default store
+```
+
+## 删除数据
+
+如果发送的不是 get 请求，需要返回一个对象来设置请求的信息
+
+获取删除的钩子，useMutation 的钩子返回的是一个数组，数组中有两个东西，第一个是操作的触发器，第二个是结果集
+
+**store/studentApi.js**
+
+```js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
+
+export const studentApi = createApi({
+  reducerPath: 'studentApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:1337/api/',
+  }),
+  endpoints(build) {
+    return {
+      getAllStudent: build.query({
+        query() {
+          return 'students'
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+      }),
+      getStudentById: build.query({
+        query(id) {
+          return `students/${id}`
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+        keepUnusedDataFor: 60,
+      }),
+      deleteStudentById: build.mutation({
+        query(id) {
+          return {
+            url: `students/${id}`,
+            method: 'delete',
+          }
+        },
+      }),
+    }
+  },
+})
+
+export const { useGetAllStudentQuery, useGetStudentByIdQuery, useDeleteStudentByIdMutation } =
+  studentApi
+```
+
+```js
+import { useState } from 'react'
+import StudentForm from '../StudentForm/StudentForm'
+import classes from './StudentItem.module.css'
+import { useDeleteStudentByIdMutation } from '../../store/studentApi'
+
+const StudentItem = (props) => {
+  const { name, age, gender, address } = props.item.attributes
+  const [isEdit, setIsEdit] = useState(false)
+  const [deleteStudentById, { isLoading, isError }] = useDeleteStudentByIdMutation()
+
+  const deleteHandler = () => {
+    deleteStudentById(props.id)
+  }
+
+  const cancelEdit = () => {
+    setIsEdit(false)
+  }
+
+  return (
+    <>
+      {!isEdit && (
+        <tr>
+          <td>{name}</td>
+          <td>{gender}</td>
+          <td>{age}</td>
+          <td>{address}</td>
+          <td>
+            <button onClick={deleteHandler}>删除</button>
+            <button
+              onClick={() => {
+                setIsEdit(true)
+              }}
+            >
+              编辑
+            </button>
+          </td>
+        </tr>
+      )}
+      {isEdit && (
+        <StudentForm id={props.item.id} data={props.item.attributes} onCancelEdit={cancelEdit} />
+      )}
+
+      {isLoading ? (
+        <tr>
+          <td colSpan={5}>数据删除中...</td>
+        </tr>
+      ) : null}
+      {isError ? (
+        <tr>
+          <td colSpan={5} className={classes.error}>
+            数据删除失败!
+          </td>
+        </tr>
+      ) : null}
+    </>
+  )
+}
+
+export default StudentItem
+```
+
+## 数据标签
+
+```js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
+
+export const studentApi = createApi({
+  reducerPath: 'studentApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:1337/api/',
+  }),
+  tagTypes: ['student'], // 用来指定Api中的标签类型
+  endpoints(build) {
+    return {
+      getAllStudent: build.query({
+        query() {
+          return 'students'
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+        providesTags: [{ type: 'student', id: 'LIST' }],
+      }),
+      getStudentById: build.query({
+        query(id) {
+          return `students/${id}`
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+        keepUnusedDataFor: 60,
+        providesTags: (result, error, id) => [{ type: 'student', id }],
+      }),
+      deleteStudentById: build.mutation({
+        query(id) {
+          return {
+            url: `students/${id}`,
+            method: 'delete',
+          }
+        },
+        invalidatesTags: [{ type: 'student', id: 'LIST' }],
+      }),
+      addStudent: build.mutation({
+        query(newStudent) {
+          return {
+            url: 'students',
+            method: 'post',
+            body: {
+              data: newStudent,
+            },
+          }
+        },
+        invalidatesTags: [{ type: 'student', id: 'LIST' }],
+      }),
+      updateStudent: build.mutation({
+        query(obj) {
+          return {
+            url: `students/${obj.id}`,
+            method: 'put',
+            body: {
+              data: obj.newStudent,
+            },
+          }
+        },
+        invalidatesTags: (result, error, obj) => [
+          { type: 'student', id: 'LIST' },
+          { type: 'student', id: obj.id },
+        ],
+      }),
+    }
+  },
+})
+
+export const {
+  useGetAllStudentQuery,
+  useGetStudentByIdQuery,
+  useDeleteStudentByIdMutation,
+  useAddStudentMutation,
+  useUpdateStudentMutation,
+} = studentApi
+```
+
+## React Router HelloWorld
+
+react-router 可以将 url 地址和组件进行映射，当用户访问某个地址时，与其对应的组件会自动的挂载
+
+react-router 使用步骤
+
+- 引入 react-router-dom 包：`npm i react-router-dom@5`
+- 在 index.js 中引入 BrowserRouter 组件
+- 将 BrowserRouter 设置为根组件
+
+将路由和组件进行映射
+
+- 使用 Route 来映射地址和组件
+- 属性：
+  - path 映射的 url 地址
+  - component 要挂载的组件
+  - exact 路径是否完整匹配，默认值为 false
+- 当 Route 的路径被访问时，其对应组件就会自动挂载
+- 注意：默认情况下 Route 并不是严格匹配，只要 url 地址的头部和 path 一致，组件就会挂载，不会检查子路径
+
+**index.js**
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import { BrowserRouter } from 'react-router-dom'
+
+const root = ReactDOM.createRoot(document.getElementById('root'))
+root.render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+)
+```
+
+**App.js**
+
+```js
+import { Route } from 'react-router-dom'
+import Home from './components/Home'
+import About from './components/About'
+
+const App = () => {
+  return (
+    <div>
+      <div>App组件</div>
+      <Route path="/" exact component={Home} />
+      <Route path="/about" exact component={About} />
+    </div>
+  )
+}
+
+export default App
+```
+
+**components/home.js**
+
+```js
+const Home = () => {
+  return (
+    <div>
+      <h1>这是主页</h1>
+    </div>
+  )
+}
+
+export default Home
+```
+
+**components/about.js**
+
+```js
+const About = () => {
+  return (
+    <div>
+      <h2>关于我们，其实是师徒四人</h2>
+      <ul>
+        <li>孙悟空</li>
+        <li>猪八戒</li>
+        <li>沙和尚</li>
+        <li>唐僧</li>
+      </ul>
+    </div>
+  )
+}
+
+export default About
+```
+
+## Link 和 NavLink
+
+在使用 react-router 时，一定不要使用 a 标签来创建超链接，因为 a 标签创建的超链接会自动向服务器发送请求重新加载页面，而我们不希望这种情况发生，可以使用 Link 组件来创建超链接，NavLink 和 Link 作用相似，只是可以指定链接激活后的样式
+
+**Menu.js**
+
+```js
+import { NavLink } from 'react-router-dom'
+import classes from './Menu.module.css'
+
+const Menu = () => {
+  return (
+    <div>
+      <ul>
+        <li>
+          {/* <Link to="/">主页</Link> */}
+          <NavLink to="/" exact activeClassName={classes.active} activeStyle={{ fontSize: '20px' }}>
+            主页
+          </NavLink>
+        </li>
+        <li>
+          {/* <Link to="/about">关于</Link> */}
+          <NavLink
+            to="/about"
+            exact
+            activeClassName={classes.active}
+            activeStyle={{ fontSize: '20px' }}
+          >
+            关于
+          </NavLink>
+        </li>
+      </ul>
+    </div>
+  )
+}
+
+export default Menu
+```
+
+**Menu.module.css**
+
+```css
+a:visited,
+a:link {
+  color: orange;
+  text-decoration: none;
+}
+
+a.active {
+  color: deepskyblue;
+  text-decoration: underline;
+}
 ```

@@ -28,7 +28,7 @@ export default function Home() {
         <div>通过英语四级、英语六级</div>
         <Line title="专业技能" />
         <ol className={classes.skills}>
-          <li>熟练掌握 HTML和CSS，熟练掌握弹性布局，能够快速实现Web端和移动端页面搭建</li>
+          <li>熟练掌握 HTML和 CSS，熟练掌握弹性布局，能够快速实现Web端和移动端页面搭建</li>
           <li>熟练掌握 JavaScript，理解原型，闭包，异步等概念，熟练掌握 ES6+ 语法</li>
           <li>
             熟悉 Node.js 和常用模块，在此基础上能够使用 Express
