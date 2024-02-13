@@ -2758,7 +2758,7 @@ export const {
 } = studentApi
 ```
 
-## React Router HelloWorld
+## React Router5 HelloWorld
 
 react-router 可以将 url 地址和组件进行映射，当用户访问某个地址时，与其对应的组件会自动的挂载
 
@@ -2900,4 +2900,455 @@ a.active {
   color: deepskyblue;
   text-decoration: underline;
 }
+```
+
+## 两种 Router
+
+关闭 nginx 服务器：`.\nginx.exe -s stop`
+
+HashRouter 会通过 url 地址中的 hash 值来对地址进行匹配
+
+BrowserRouter 直接通过 url 地址进行组件的跳转，使用过程中和普通的 url 地址没有区别
+
+react-router 可以将 url 地址和组件进行映射，当用户访问某个地址时，与其对应的组件会自动的挂载，当我们通过点击 Link 构建的链接进行跳转时，跳转并没有经过服务器，所以没有问题，但是当我们刷新页面，或通过普通链接进行跳转时，会向服务器发送请求加载数据，这时的请求并没有经过 react-router 所以会返回 404
+
+解决方案：
+
+- 使用 HashRouter，服务器不会去判断 hash 值，所以使用 HashRouter 后请求将会由 React Router 处理
+- 修改服务器的配置，将所有请求都转发到 index.html
+  ```
+  location / {
+      root   html;
+      #index  index.html index.htm;
+      try_files $uri /index.html;
+  }
+  ```
+- 修改服务器的配置后，需要重新加载配置文件：`.\nginx.exe -s reload`
+
+## Route 组件
+
+component 用来指定路由匹配后被挂载的组件，component 需要直接传递组件的类，通过 component 构建的组件，它会自动创建组件并且会自动传递参数
+
+- match：匹配的信息
+  - isExact 检查路径是否完全匹配，与 exact 属性无关
+  - params 请求的 params 参数
+- location：地址信息
+- history：控制页面的跳转
+  - push() 跳转页面，push() 需要一个 location 作为参数
+  - replace() 替换页面
+
+**App.js**
+
+```js
+import { Route } from 'react-router-dom'
+import Home from './components/Home'
+import About from './components/About'
+import Menu from './components/Menu'
+import Student from './components/Student'
+
+const App = () => {
+  return (
+    <div>
+      <Menu />
+      <Route path="/" exact component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/student/:id" component={Student} />
+    </div>
+  )
+}
+
+export default App
+```
+
+**About.js**
+
+```js
+const About = (props) => {
+  const clickHandler = () => {
+    // props.history.push({
+    //   pathname: 'student/3',
+    // })
+
+    props.history.replace({
+      pathname: 'student/3',
+      state: {
+        name: '哈哈哈',
+      },
+    })
+  }
+
+  return (
+    <div>
+      <button onClick={clickHandler}>点我一下</button>
+      <h2>关于我们，其实是师徒四人</h2>
+      <ul>
+        <li>孙悟空</li>
+        <li>猪八戒</li>
+        <li>沙和尚</li>
+        <li>唐僧</li>
+      </ul>
+    </div>
+  )
+}
+
+export default About
+```
+
+**Student.js**
+
+```js
+const STU_DATA = [
+  {
+    id: 1,
+    name: '孙悟空',
+  },
+  {
+    id: 2,
+    name: '猪八戒',
+  },
+  {
+    id: 3,
+    name: '沙和尚',
+  },
+  {
+    id: 4,
+    name: '唐僧',
+  },
+]
+
+const Student = (props) => {
+  console.log(props.location.state.name)
+
+  const stu = STU_DATA.find((item) => +props.match.params.id === item.id)
+  return (
+    <div>
+      {stu.id} {stu.name}
+    </div>
+  )
+}
+
+export default Student
+```
+
+## Route 组件
+
+render 也可以用来指定要挂载的组件，render 需要一个回调函数作为参数，回调函数的返回值会被最终挂载，render 不会自动传递 match、location、history 三个属性
+
+children 也可以用来指定被挂载的组件，用法有两种：
+
+- 和 render 类似，传递回调函数，当 children 设置一个回调函数时，该组件无论路径是否匹配都会挂载
+- 传递一个组件
+
+除了可以通过 props 获取 match、location、history 三个属性外，也可以通过钩子函数来获取
+
+**App.js**
+
+```js
+import { Route } from 'react-router-dom'
+import Home from './components/Home'
+import About from './components/About'
+import Menu from './components/Menu'
+import Student from './components/Student'
+
+const App = () => {
+  return (
+    <div>
+      <Menu />
+      <Route path="/" exact component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/student/:id" component={Student} />
+      {/* <Route path="/student/:id" render={(routeProps) => <Student {...routeProps} />} /> */}
+      {/* <Route path="/student/:id" children={(routeProps) => <Student {...routeProps} />} /> */}
+      {/* <Route path="/student/:id" children={<Student />} /> */}
+      {/* <Route path="/student/:id">
+        <Student />
+      </Route> */}
+      {/* <Route path="/student/:id">{(routeProps) => <Student {...routeProps} />}</Route> */}
+    </div>
+  )
+}
+
+export default App
+```
+
+**Student.js**
+
+```js
+import { useHistory, useLocation, useParams, useRouteMatch } from 'react-router-dom'
+
+const STU_DATA = [
+  {
+    id: 1,
+    name: '孙悟空',
+  },
+  {
+    id: 2,
+    name: '猪八戒',
+  },
+  {
+    id: 3,
+    name: '沙和尚',
+  },
+  {
+    id: 4,
+    name: '唐僧',
+  },
+]
+
+const Student = (props) => {
+  const match = useRouteMatch()
+  const location = useLocation()
+  const history = useHistory()
+  const params = useParams()
+
+  const stu = STU_DATA.find((item) => +match.params.id === item.id)
+
+  return (
+    <div>
+      {stu.id} {stu.name}
+    </div>
+  )
+}
+
+export default Student
+```
+
+## 路由的嵌套
+
+**App.js**
+
+```js
+import { Route } from 'react-router-dom'
+import About from './components/About'
+import Home from './components/Home'
+import Menu from './components/Menu'
+import Student from './components/Student'
+
+const App = () => {
+  return (
+    <div>
+      <Menu />
+      <Route path="/" exact component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/student/:id" component={Student} />
+    </div>
+  )
+}
+
+export default App
+```
+
+**About.js**
+
+```js
+import { Route } from 'react-router-dom'
+import Hello from './Hello'
+import { useRouteMatch } from 'react-router-dom'
+
+const About = () => {
+  const match = useRouteMatch()
+
+  return (
+    <div>
+      <h2>关于我们，其实是师徒四人</h2>
+      <ul>
+        <li>孙悟空</li>
+        <li>猪八戒</li>
+        <li>沙和尚</li>
+        <li>唐僧</li>
+      </ul>
+      <Route path={`${match.path}/hello`}>
+        <Hello />
+      </Route>
+    </div>
+  )
+}
+
+export default About
+```
+
+## Prompt 组件
+
+```js
+import { useState } from 'react'
+import { Prompt } from 'react-router-dom'
+
+const MyForm = () => {
+  const [isPrompt, setIsPrompt] = useState(false)
+  const [inputData, setInputData] = useState('')
+
+  const inputHandler = (e) => {
+    if (e.target.value.trim().length) {
+      setInputData(e.target.value.trim())
+      setIsPrompt(true)
+    }
+  }
+
+  return (
+    <div>
+      <Prompt when={isPrompt} message="你确认要离开页面吗" />
+      <input onInput={inputHandler} value={inputData} type="text" />
+    </div>
+  )
+}
+
+export default MyForm
+```
+
+## Switch 组件
+
+可以将 Route 统一放到一个 Switch 中，一个 Switch 中只会有一个路由显示
+
+```js
+import { Route } from 'react-router-dom'
+import About from './components/About'
+import Home from './components/Home'
+import Menu from './components/Menu'
+import Student from './components/Student'
+import MyForm from './components/MyForm'
+import { Switch } from 'react-router-dom'
+
+const App = () => {
+  return (
+    <div>
+      <Menu />
+      <Switch>
+        <Route path="/" exact component={Home} />
+        <Route path="/about" component={About} />
+        <Route path="/student/:id" component={Student} />
+        <Route path="/form">
+          <MyForm />
+        </Route>
+        <Route path="*">
+          <h2>404 NOT FOUND</h2>
+        </Route>
+      </Switch>
+    </div>
+  )
+}
+
+export default App
+```
+
+## Redirect 组件
+
+Redirect 用于跳转页面
+
+```js
+import { useState } from 'react'
+import { Redirect, Route, Switch } from 'react-router-dom'
+import About from './components/About'
+import Home from './components/Home'
+import Login from './components/Login'
+import Menu from './components/Menu'
+import MyForm from './components/MyForm'
+import Student from './components/Student'
+
+const App = () => {
+  const [isLogin, setIsLogin] = useState(true)
+
+  return (
+    <div>
+      <Menu />
+      <Switch>
+        <Route path="/" exact component={Home} />
+        <Route path="/about" component={About} />
+        <Route path="/student/:id" component={Student} />
+        <Route path="/login" component={Login} />
+        <Route path="/form">{isLogin ? <MyForm /> : <Redirect to="/login" />}</Route>
+        <Redirect from="/abc" to="/form" />
+        <Route path="*">
+          <h2>404 NOT FOUND</h2>
+        </Route>
+      </Switch>
+    </div>
+  )
+}
+
+export default App
+```
+
+## React Router6 HelloWorld
+
+Routes
+
+- v6 中新增加的组件
+- 作用和 Switch 类似，都是用于 Route 的容器
+- Routes 中 Route 只有一个会被匹配
+
+v6 中，Route 的 component、render、children 都变了，需要通过 element 来指定要挂载的组件
+
+**App.js**
+
+```js
+import { Route, Routes } from 'react-router-dom'
+import Home from './components/Home'
+import About from './components/About'
+import Menu from './components/Menu'
+
+const App = () => {
+  return (
+    <div>
+      <Menu />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </div>
+  )
+}
+
+export default App
+```
+
+## 参数和钩子
+
+- 可以使用 useParams() 来获取参数
+- useLocation()：获取当前的地址信息
+- useMatch()：用来检查当前 url 是否匹配某个路由，如果路径匹配，则返回一个对象，不匹配则返回 null
+- useNavigate()：获取一个用于跳转页面的函数
+
+```js
+import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom'
+
+const STU_DATA = [
+  {
+    id: 1,
+    name: '刘备',
+  },
+  {
+    id: 2,
+    name: '关羽',
+  },
+  {
+    id: 3,
+    name: '张飞',
+  },
+]
+
+const Student = () => {
+  const params = useParams()
+  const location = useLocation()
+  const match = useMatch('/student/:id')
+  const student = STU_DATA.find((item) => item.id === +params.id)
+
+  const nav = useNavigate()
+  const clickHandler = () => {
+    // nav('/about')
+    nav('/about', {
+      replace: true,
+    })
+  }
+
+  return (
+    <div>
+      <button onClick={clickHandler}>点我一下</button>
+      <div>
+        {student.id} {student.name}
+      </div>
+    </div>
+  )
+}
+
+export default Student
 ```
