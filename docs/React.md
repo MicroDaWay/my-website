@@ -3352,3 +3352,241 @@ const Student = () => {
 
 export default Student
 ```
+
+## 嵌套路由和 Outlet
+
+`Outlet`
+
+- 用来表示嵌套路由中的组件
+- 当嵌套路由中的路径匹配成功了，Outlet 则表示嵌套路由中的组件
+- 当嵌套路由中的路径没有匹配成功，Outlet 就什么都不显示
+
+**App.js**
+
+```js
+import { Route, Routes } from 'react-router-dom'
+import About from './components/About'
+import Hello from './components/Hello'
+import Home from './components/Home'
+import Menu from './components/Menu'
+import Student from './components/Student'
+
+const App = () => {
+  return (
+    <div>
+      <Menu />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />}>
+          <Route path="hello" element={<Hello />} />
+        </Route>
+        <Route path="/student/:id" element={<Student />} />
+      </Routes>
+    </div>
+  )
+}
+
+export default App
+```
+
+**About.js**
+
+```js
+import { Outlet } from 'react-router-dom'
+
+const About = () => {
+  return (
+    <div>
+      <h2>关于我们，其实是三个人</h2>
+      <ul>
+        <li>刘备</li>
+        <li>关羽</li>
+        <li>张飞</li>
+      </ul>
+      <Outlet />
+    </div>
+  )
+}
+
+export default About
+```
+
+## Navigate 组件
+
+Navigate 组件用来跳转到指定的位置，默认使用 push 跳转
+
+```js
+import { Navigate, Outlet } from 'react-router-dom'
+
+const About = () => {
+  return (
+    <div>
+      <Navigate to="/student/2" replace />
+      <h2>关于我们，其实是三个人</h2>
+      <ul>
+        <li>刘备</li>
+        <li>关羽</li>
+        <li>张飞</li>
+      </ul>
+      <Outlet />
+    </div>
+  )
+}
+
+export default About
+```
+
+## NavLink
+
+```js
+import { NavLink } from 'react-router-dom'
+
+const Menu = () => {
+  return (
+    <div>
+      <ul>
+        <li>
+          <NavLink
+            to="/"
+            style={({ isActive }) => {
+              return isActive
+                ? {
+                    color: 'red',
+                  }
+                : {
+                    textDecoration: 'none',
+                  }
+            }}
+          >
+            主页
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/about"
+            style={({ isActive }) => {
+              return isActive
+                ? {
+                    color: 'red',
+                  }
+                : {
+                    textDecoration: 'none',
+                  }
+            }}
+          >
+            关于
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/student/3"
+            style={({ isActive }) => {
+              return isActive
+                ? {
+                    color: 'red',
+                  }
+                : {
+                    textDecoration: 'none',
+                  }
+            }}
+          >
+            学生
+          </NavLink>
+        </li>
+      </ul>
+    </div>
+  )
+}
+
+export default Menu
+```
+
+## 添加服务器验证
+
+```js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
+
+export const studentApi = createApi({
+  reducerPath: 'studentApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:1337/api/',
+    prepareHeaders: (headers, api) => {
+      const token = api.getState().auth.token
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`)
+      }
+      return headers
+    },
+  }),
+  tagTypes: ['student'], // 用来指定Api中的标签类型
+  endpoints(build) {
+    return {
+      getAllStudent: build.query({
+        query() {
+          return {
+            url: 'students',
+          }
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+        providesTags: [{ type: 'student', id: 'LIST' }],
+      }),
+      getStudentById: build.query({
+        query(id) {
+          return `students/${id}`
+        },
+        transformResponse(baseQueryReturnValue) {
+          return baseQueryReturnValue.data
+        },
+        keepUnusedDataFor: 60,
+        providesTags: (result, error, id) => [{ type: 'student', id }],
+      }),
+      deleteStudentById: build.mutation({
+        query(id) {
+          return {
+            url: `students/${id}`,
+            method: 'delete',
+          }
+        },
+        invalidatesTags: [{ type: 'student', id: 'LIST' }],
+      }),
+      addStudent: build.mutation({
+        query(newStudent) {
+          return {
+            url: 'students',
+            method: 'post',
+            body: {
+              data: newStudent,
+            },
+          }
+        },
+        invalidatesTags: [{ type: 'student', id: 'LIST' }],
+      }),
+      updateStudent: build.mutation({
+        query(obj) {
+          return {
+            url: `students/${obj.id}`,
+            method: 'put',
+            body: {
+              data: obj.newStudent,
+            },
+          }
+        },
+        invalidatesTags: (result, error, obj) => [
+          { type: 'student', id: 'LIST' },
+          { type: 'student', id: obj.id },
+        ],
+      }),
+    }
+  },
+})
+
+export const {
+  useGetAllStudentQuery,
+  useGetStudentByIdQuery,
+  useDeleteStudentByIdMutation,
+  useAddStudentMutation,
+  useUpdateStudentMutation,
+} = studentApi
+```
