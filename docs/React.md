@@ -3590,3 +3590,74 @@ export const {
   useUpdateStudentMutation,
 } = studentApi
 ```
+
+## useMemo
+
+useMemo 用来存储函数的执行结果
+
+**App.js**
+
+```js
+import { useMemo, useState } from 'react'
+import Some from './components/Some'
+
+const sum = (a, b) => {
+  const begin = Date.now()
+  while (1) {
+    if (Date.now() - begin > 3000) {
+      break
+    }
+  }
+  console.log('函数执行了')
+  return a + b
+}
+
+const App = () => {
+  const [count, setCount] = useState(1)
+
+  let a = 1
+  let b = 2
+
+  if (count % 10 === 0) {
+    a++
+  }
+
+  // const result = useMemo(() => {
+  //   return sum(a, b)
+  // }, [a, b])
+
+  const SomeComponent = useMemo(() => {
+    return <Some a={a} b={b} />
+  }, [a, b])
+
+  const clickHandler = () => {
+    setCount((prevState) => prevState + 1)
+  }
+  return (
+    <div>
+      <div>App result= count={count}</div>
+      {SomeComponent}
+      <button onClick={clickHandler}>点我一下</button>
+    </div>
+  )
+}
+
+export default App
+```
+
+**Some.js**
+
+```js
+const Some = (props) => {
+  const begin = Date.now()
+  while (1) {
+    if (Date.now() - begin > 3000) {
+      break
+    }
+  }
+
+  return <div>Some {props.a + props.b}</div>
+}
+
+export default Some
+```

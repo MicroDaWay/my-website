@@ -4,7 +4,7 @@ sidebar_position: 13
 
 # 配置
 
-## 在 Vite 中配置 scss 全局变量
+## 配置 scss 全局变量
 
 **vite.config.ts**
 
@@ -19,6 +19,43 @@ export default defineConfig({
     },
   },
 })
+```
+
+## 配置路径别名
+
+**vite.config.ts**
+
+安装依赖：`npm i @types/node -D`
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+})
+```
+
+## 配置路径别名的提示
+
+**tsconfig.json**
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
 ```
 
 ## 配置环境变量
@@ -545,4 +582,225 @@ declare module 'vue' {
 import type XtxGuess from '@/components/XtxGuess.vue'
 
 export type XtxGuessInstance = InstanceType<typeof XtxGuess>
+```
+
+## React 路由基本配置方式一
+
+**router/index.tsx**
+
+```tsx
+import App from '@/App'
+import About from '@/views/About/About'
+import Home from '@/views/Home/Home'
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
+
+const Router = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default Router
+```
+
+**main.tsx**
+
+```tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+// 样式初始化一般放到最前面
+import 'reset-css'
+// 全局样式
+import '@/assets/styles/global.scss'
+import Router from '@/router'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <Router />
+  </React.StrictMode>
+)
+```
+
+**App.tsx**
+
+```tsx
+import { Outlet } from 'react-router-dom'
+
+const App = () => {
+  return (
+    <div>
+      <Outlet />
+    </div>
+  )
+}
+
+export default App
+```
+
+## React 路由基本配置方式二
+
+**router/index.tsx**
+
+```tsx
+import About from '@/views/About/About'
+import Home from '@/views/Home/Home'
+import { Navigate } from 'react-router-dom'
+
+const router = [
+  {
+    path: '/',
+    element: <Navigate to="/home" />,
+  },
+  {
+    path: '/home',
+    element: <Home />,
+  },
+  {
+    path: '/about',
+    element: <About />,
+  },
+]
+
+export default router
+```
+
+**main.tsx**
+
+```tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+// 样式初始化一般放到最前面
+import 'reset-css'
+// 全局样式
+import '@/assets/styles/global.scss'
+import { BrowserRouter } from 'react-router-dom'
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+)
+```
+
+**App.tsx**
+
+```tsx
+import { useRoutes } from 'react-router-dom'
+import router from './router'
+
+const App = () => {
+  const outlet = useRoutes(router)
+
+  return <div>{outlet}</div>
+}
+
+export default App
+```
+
+## React 路由重定向
+
+```tsx
+import App from '@/App'
+import About from '@/views/About/About'
+import Home from '@/views/Home/Home'
+import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom'
+
+const Router = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />}>
+          <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default Router
+```
+
+## React 路由懒加载
+
+```tsx
+import { Suspense, lazy } from 'react'
+import { Navigate } from 'react-router-dom'
+
+const Home = lazy(() => import('@/views/Home/Home'))
+const About = lazy(() => import('@/views/About/About'))
+
+const router = [
+  {
+    path: '/',
+    element: <Navigate to="/home" />,
+  },
+  {
+    path: '/home',
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <Home />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/about',
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <About />
+      </Suspense>
+    ),
+  },
+]
+
+export default router
+```
+
+## React 嵌套路由写法
+
+```tsx
+import { Suspense, lazy } from 'react'
+import { Navigate } from 'react-router-dom'
+
+const Home = lazy(() => import('@/views/Home/Home'))
+const PageOne = lazy(() => import('@/views/PageOne/PageOne'))
+const PageTwo = lazy(() => import('@/views/PageTwo/PageTwo'))
+
+const loadingComponent = (component: JSX.Element) => {
+  return <Suspense fallback={<div>Loading...</div>}>{component}</Suspense>
+}
+
+const router = [
+  {
+    path: '/',
+    element: <Navigate to="/page-one" />,
+  },
+  {
+    path: '/',
+    element: <Home />,
+    children: [
+      {
+        path: 'page-one',
+        element: loadingComponent(<PageOne />),
+      },
+      {
+        path: 'page-two',
+        element: loadingComponent(<PageTwo />),
+      },
+    ],
+  },
+]
+
+export default router
 ```
