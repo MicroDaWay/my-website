@@ -804,3 +804,125 @@ const router = [
 
 export default router
 ```
+
+## react-redux
+
+**store/index.ts**
+
+```ts
+import { legacy_createStore } from 'redux'
+import reducer from './reducer'
+
+const store = legacy_createStore(reducer)
+
+export default store
+```
+
+**store/reducer.ts**
+
+```ts
+const initialState = {
+  num: 100,
+}
+
+const reducer = (state = initialState, action: { type: string; payload: number }) => {
+  const newState = structuredClone(state)
+
+  switch (action.type) {
+    case 'ADD':
+      newState.num += action.payload
+      break
+    default:
+      break
+  }
+
+  return newState
+}
+
+export default reducer
+```
+
+**使用**
+
+```tsx
+import { useDispatch, useSelector } from 'react-redux'
+
+const PageOne = () => {
+  const obj: any = useSelector((state) => state)
+  const dispatch = useDispatch()
+
+  const clickHandler = () => {
+    dispatch({
+      type: 'ADD',
+      payload: 5,
+    })
+  }
+
+  return (
+    <div>
+      <div>栏目一 {obj.num}</div>
+      <button onClick={clickHandler}>点我一下</button>
+    </div>
+  )
+}
+
+export default PageOne
+```
+
+## react-redux 数据和方法从 reducer 中进行抽离
+
+**store/Num**
+
+```ts
+export interface NumActionType {
+  type: string
+  payload: number
+}
+
+export interface NumState {
+  num: number
+}
+
+export default {
+  state: {
+    num: 100,
+  },
+  actions: {
+    add(state: NumState, action: NumActionType) {
+      state.num += action.payload
+    },
+    sub(state: NumState, action: NumActionType) {
+      state.num -= action.payload
+    },
+  },
+}
+```
+
+**reducer.ts**
+
+```ts
+import NumState, { NumActionType } from './Num/Num'
+
+const initialState = {
+  ...NumState.state,
+}
+
+const reducer = (state = initialState, action: NumActionType) => {
+  const newState = structuredClone(state)
+
+  switch (action.type) {
+    case 'ADD':
+      NumState.actions.add(newState, action)
+      break
+    case 'SUB':
+      NumState.actions.sub(newState, action)
+      break
+    default:
+      break
+  }
+
+  return newState
+}
+
+export default reducer
+```
