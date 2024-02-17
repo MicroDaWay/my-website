@@ -813,7 +813,14 @@ export default router
 import { legacy_createStore } from 'redux'
 import reducer from './reducer'
 
-const store = legacy_createStore(reducer)
+interface Window {
+  __REDUX_DEVTOOLS_EXTENSION__: Function
+}
+
+const store = legacy_createStore(
+  reducers,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+)
 
 export default store
 ```
@@ -925,4 +932,173 @@ const reducer = (state = initialState, action: NumActionType) => {
 }
 
 export default reducer
+```
+
+## react-redux 模块化 reducer
+
+**store/index.ts**
+
+```ts
+import { combineReducers, legacy_createStore } from 'redux'
+import ArrReducer from './Arr/ArrReducer'
+import NumReducer from './Num/NumReducer'
+
+const reducers = combineReducers({
+  NumReducer,
+  ArrReducer,
+})
+
+const store = legacy_createStore(reducers)
+
+export default store
+```
+
+**store/Num.ts**
+
+```ts
+export interface NumActionType {
+  type: string
+  payload: number
+}
+
+export interface NumState {
+  num: number
+}
+
+export default {
+  state: {
+    num: 100,
+  },
+  actions: {
+    add(state: NumState, action: NumActionType) {
+      state.num += action.payload
+    },
+    sub(state: NumState, action: NumActionType) {
+      state.num -= action.payload
+    },
+  },
+  ADD: 'ADD',
+  SUB: 'SUB',
+}
+```
+
+**store/NumReducer.ts**
+
+```ts
+import NumState, { NumActionType } from './Num'
+
+const reducer = (
+  state = {
+    ...NumState.state,
+  },
+  action: NumActionType
+) => {
+  const newState = structuredClone(state)
+
+  switch (action.type) {
+    case NumState.ADD:
+      NumState.actions.add(newState, action)
+      break
+    case NumState.SUB:
+      NumState.actions.sub(newState, action)
+      break
+    default:
+      break
+  }
+
+  return newState
+}
+
+export default reducer
+```
+
+**store/Arr.ts**
+
+```ts
+export interface ArrActionType {
+  type: string
+  payload: number
+}
+
+export interface ArrState {
+  arr: number[]
+}
+
+export default {
+  state: {
+    arr: [10, 20, 30],
+  },
+  actions: {
+    arrPush(state: ArrState, action: ArrActionType) {
+      state.arr.push(action.payload)
+    },
+  },
+  arrPush: 'arrPush',
+}
+```
+
+**store/ArrReducer.ts**
+
+```ts
+import ArrState, { ArrActionType } from './Arr'
+
+const reducer = (
+  state = {
+    ...ArrState.state,
+  },
+  action: ArrActionType
+) => {
+  const newState = structuredClone(state)
+
+  switch (action.type) {
+    case ArrState.arrPush:
+      ArrState.actions.arrPush(newState, action)
+      break
+    default:
+      break
+  }
+
+  return newState
+}
+
+export default reducer
+```
+
+**使用**
+
+```tsx
+import store from '@/store'
+import { useDispatch, useSelector } from 'react-redux'
+
+type RootState = ReturnType<typeof store.getState>
+
+const PageOne = () => {
+  const numObj = useSelector((state: RootState) => state.NumReducer)
+  const arrObj = useSelector((state: RootState) => state.ArrReducer)
+  const dispatch = useDispatch()
+
+  const clickHandler = () => {
+    dispatch({
+      type: 'ADD',
+      payload: 5,
+    })
+
+    dispatch({
+      type: 'arrPush',
+      payload: 40,
+    })
+  }
+
+  return (
+    <div>
+      <div>栏目一 {numObj.num} </div>
+      {arrObj.arr.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+      <button onClick={clickHandler}>点我一下</button>
+    </div>
+  )
+}
+
+export default PageOne
 ```

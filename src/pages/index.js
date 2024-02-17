@@ -39,7 +39,7 @@ export default function Home() {
           <li>熟悉 Vue2 及 Vue3 全家桶，能够使用 Vue3 结合 TypeScript 进行类型检查</li>
           <li>了解微信小程序和 uni-app 的开发</li>
           <li>了解 ECharts 数据可视化工具的使用</li>
-          <li>了解 Java，了解 Linux 的常用命令，熟悉 MySQL 数据库的常用 SQL 语句</li>
+          <li>了解 React 的使用</li>
         </ol>
         <Line title="项目经历" />
         <div>
