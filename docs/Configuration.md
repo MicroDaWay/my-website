@@ -45,7 +45,7 @@ export default defineConfig({
 
 ## 配置路径别名的提示
 
-**tsconfig.json**
+**tsconfig.json/jsconfig.json**
 
 ```json
 {
