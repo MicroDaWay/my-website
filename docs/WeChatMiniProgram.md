@@ -480,3 +480,458 @@ Page({
   },
 })
 ```
+
+## 小程序运行机制
+
+https://developers.weixin.qq.com/miniprogram/dev/framework/runtime/operating-mechanism.html#_1-1-%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%90%AF%E5%8A%A8
+
+## 小程序更新机制
+
+https://developers.weixin.qq.com/miniprogram/dev/framework/runtime/update-mechanism.html
+
+**app.js**
+
+```js
+App({
+  onLaunch() {
+    const updateManager = wx.getUpdateManager()
+
+    updateManager.onCheckForUpdate(function (res) {
+      // 请求完新版本信息的回调
+      console.log(res.hasUpdate)
+    })
+
+    updateManager.onUpdateReady(function () {
+      wx.showModal({
+        title: '更新提示',
+        content: '新版本已经准备好，是否重启应用？',
+        success(res) {
+          if (res.confirm) {
+            // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+            updateManager.applyUpdate()
+          }
+        },
+      })
+    })
+
+    updateManager.onUpdateFailed(function () {
+      // 新版本下载失败
+    })
+  },
+})
+```
+
+## 小程序生命周期介绍
+
+应用生命周期是指应用程序进程从创建到消亡的整个过程
+
+小程序的生命周期指的是小程序从启动到销毁的整个过程
+
+**一个小程序完整的生命周期由应用生命周期、页面生命周期和组件生命周期三部分来组成**
+
+小程序生命周期伴随着一些函数，这些函数由小程序框架本身提供，被称为生命周期函数，生命周期函数会按照顺序依次自动触发调用，帮助程序员在特定的时机执行特定的操作，辅助程序员完成一些比较复杂的逻辑
+
+## 应用生命周期
+
+应用生命周期通常是指一个小程序从启动-->运行-->销毁的整个过程
+
+应用生命周期伴随着一些函数，我们称为应用生命周期函数，应用生命周期函数需要在 app.js 文件的 App() 方法中进行定义，App() 方法必须在 app.js 中进行调用，主要用来注册小程序
+
+应用生命周期函数由 onLaunch、onShow、onHide 三个函数组成
+
+![微信小程序应用生命周期函数](../static/img/微信小程序应用生命周期函数.png)
+
+从小程序生命周期的角度来看，我们一般讲的启动专指冷启动，热启动一般被称为后台切前台
+
+https://developers.weixin.qq.com/miniprogram/dev/reference/api/App.html#onLaunch-Object-object
+
+**app.js**
+
+```js
+App({
+  /**
+   * 当小程序初始化完成时，会触发 onLaunch（全局只触发一次）
+   */
+  onLaunch: function () {
+    console.log('onLaunch')
+  },
+
+  /**
+   * 当小程序启动，或从后台进入前台显示，会触发 onShow
+   */
+  onShow: function (options) {
+    console.log('onShow')
+  },
+
+  /**
+   * 当小程序从前台进入后台，会触发 onHide
+   */
+  onHide: function () {
+    console.log('onHide')
+  },
+
+  /**
+   * 当小程序发生脚本错误，或者 api 调用失败时，会触发 onError 并带上错误信息
+   */
+  onError: function (msg) {},
+})
+```
+
+## 页面生命周期
+
+页面生命周期就是指小程序页面从加载-->运行-->销毁的整个过程
+
+页面生命周期函数需要在 Page() 方法进行定义
+
+![微信小程序页面生命周期函数](../static/img/微信小程序页面生命周期函数.png)
+
+https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html
+
+**my.js**
+
+```js
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {},
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function (options) {
+    console.log('onLoad')
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function () {
+    console.log('onReady')
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+    console.log('onShow')
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function () {
+    console.log('onHide')
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function () {
+    console.log('onUnload')
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function () {},
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function () {},
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function () {},
+})
+```
+
+## 生命周期两个细节
+
+tabBar 页面之间相互切换，页面不会被销毁
+
+点击左上角，返回上一个页面，会销毁当前页面
+
+## 小程序 API 介绍
+
+小程序分类
+
+- 异步 API：通常都接受一个对象类型的参数，例如：`wx.request({})`
+- 同步 API：约定以 Sync 结尾，例如：`wx.setStorageSync()`
+- 事件监听 API：约定以 on 开头，例如：`wx.onAppHide()`
+
+异步 API 支持 callback 和 Promise 两种调用方式：
+
+- 当接口参数对象中不包含 success、fail、complete 时将默认返回 Promise
+- 部分接口如 request、uploadFile 本身就有返回值，因此不支持 Promise 风格的调用方式，它们的 promisify 需要开发者自行封装
+
+## 网络请求
+
+```wxml
+<button bind:tap="getData" type="primary">点我获取数据</button>
+```
+
+```js
+Page({
+  data: {
+    list: [],
+  },
+  getData() {
+    wx.request({
+      url: 'https://gmall-prod.atguigu.cn/mall-api/index/findBanner',
+      success: (res) => {
+        if (res.data.code === 200) {
+          this.setData({
+            list: res.data.data,
+          })
+        }
+      },
+    })
+  },
+})
+```
+
+## 界面交互 loading 提示框
+
+wx.showLoading()：显示 loading 提示框
+
+wx.hideLoading()：关闭 loading 提示框
+
+```js
+Page({
+  data: {
+    list: [],
+  },
+  getData() {
+    wx.showLoading({
+      title: '数据加载中...',
+      mask: true,
+    })
+    wx.request({
+      url: 'https://gmall-prod.atguigu.cn/mall-api/index/findBanner',
+      success: (res) => {
+        if (res.data.code === 200) {
+          this.setData({
+            list: res.data.data,
+          })
+        }
+      },
+      complete: (res) => {
+        wx.hideLoading()
+      },
+    })
+  },
+})
+```
+
+## 界面交互-模态对话框-消息提示框
+
+```js
+Page({
+  async deleteHandler() {
+    const res = await wx.showModal({
+      title: '提示',
+      content: '你确定要删除吗',
+    })
+
+    if (res.confirm) {
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success',
+      })
+    } else {
+      wx.showToast({
+        title: '取消删除',
+        icon: 'none',
+      })
+    }
+  },
+})
+```
+
+## 本地存储
+
+小程序本地存储
+
+- 同步 API
+  - 存储：wx.setStorageSync()
+  - 获取：wx.getStorageSync()
+  - 删除：wx.removeStorageSync()
+  - 清空：wx.clearStorageSync()
+- 异步 API
+  - 存储：wx.setStorage()
+  - 获取：wx.getStorage()
+  - 删除：wx.removeStorage()
+  - 清空：wx.clearStorage()
+
+**注意事项：对象类型的数据，可以直接进行存储获取，无需使用 JSON.stringify() 和 JSON.parse() 进行转换**
+
+**同步 API**
+
+```js
+Page({
+  // 存储
+  setStorage() {
+    wx.setStorageSync('num', 1)
+    wx.setStorageSync('obj', {
+      name: '孙悟空',
+      age: 18,
+    })
+  },
+  // 获取
+  getStorage() {
+    const num = wx.getStorageSync('num')
+    const obj = wx.getStorageSync('obj')
+    console.log(num)
+    console.log(obj)
+  },
+  // 删除
+  removeStorage() {
+    wx.removeStorageSync('obj')
+  },
+  // 清空
+  clearStorage() {
+    wx.clearStorageSync()
+  },
+})
+```
+
+**异步 API**
+
+```js
+Page({
+  // 存储
+  setStorage() {
+    wx.setStorage({
+      key: 'num',
+      data: 1,
+    })
+
+    wx.setStorage({
+      key: 'obj',
+      data: {
+        name: '猪八戒',
+        age: 28,
+      },
+    })
+  },
+  // 获取
+  async getStorage() {
+    const num = await wx.getStorage({
+      key: 'num',
+    })
+
+    const obj = await wx.getStorage({
+      key: 'obj',
+    })
+
+    console.log(num.data)
+    console.log(obj.data)
+  },
+  // 删除
+  removeStorage() {
+    wx.removeStorage({
+      key: 'obj',
+    })
+  },
+  // 清空
+  clearStorage() {
+    wx.clearStorage()
+  },
+})
+```
+
+## 路由与通信
+
+小程序中实现页面的跳转，有两种方式：
+
+- 声明式导航：navigate 组件
+- 编程式导航：使用小程序提供的 API
+  - wx.navigateTo()：保留当前页面，跳转到应用内的某个页面。但是不能跳到 tabBar 页面。使用 wx.navigateBack 可以返回到原页面。小程序中页面栈最多十层
+  - wx.redirectTo()：关闭当前页面，跳转到应用内的某个页面。但是不允许跳转到 tabBar 页面
+  - wx.switchTab()：跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面，**路径后面不能传递参数**
+  - wx.reLaunch()：关闭所有页面，打开到应用内的某个页面
+  - wx.navigateBack()：关闭当前页面，返回上一页面或多级页面。可通过 getCurrentPages 获取当前的页面栈，决定需要返回几层
+
+路径后可以带参数，参数与路径之间使用 ? 分隔，参数键与参数值使用 = 相连，多个参数用 & 分隔，例如 path?name=孙悟空&age=18
+
+参数需要在跳转到的页面的 onLoad 钩子函数中通过形参进行接收
+
+```js
+Page({
+  navigateTo() {
+    wx.navigateTo({
+      url: '/pages/list/list?name=孙悟空&age=18',
+    })
+  },
+  redirectTo() {
+    wx.redirectTo({
+      url: '/pages/list/list?name=孙悟空&age=18',
+    })
+  },
+  switchTab() {
+    wx.switchTab({
+      url: '/pages/cart/cart',
+    })
+  },
+  reLaunch() {
+    wx.reLaunch({
+      url: '/pages/list/list?name=孙悟空&age=18',
+    })
+  },
+  navigateBack() {
+    wx.navigateBack({
+      delta: 2,
+    })
+  },
+})
+```
+
+## 页面处理函数-上拉加载
+
+小程序中实现上拉加载的方式：
+
+- 在 app.json 或者 page.json 中配置距离页面底部距离：onReachBottomDistance，默认为 50px
+- 在页面.js 中定义 onReachBottom 事件监听用户上拉加载
+
+**cart.json**
+
+```json
+{
+  "usingComponents": {},
+  "onReachBottomDistance": 100
+}
+```
+
+**cart.wxml**
+
+```wxml
+<view wx:for="{{numList}}" wx:key="item">{{item}}</view>
+```
+
+**cart.js**
+
+```js
+Page({
+  data: {
+    numList: [1, 2, 3],
+  },
+  // 上拉触底加载
+  onReachBottom() {
+    wx.showLoading({
+      title: '数据加载中...',
+    })
+
+    setTimeout(() => {
+      const newList = this.data.numList.slice(-3).map((item) => item + 3)
+      this.setData({
+        numList: [...this.data.numList, ...newList],
+      })
+
+      wx.hideLoading()
+    }, 1000)
+  },
+})
+```
