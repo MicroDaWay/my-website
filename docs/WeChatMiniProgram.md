@@ -935,3 +935,306 @@ Page({
   },
 })
 ```
+
+## 页面处理函数-下拉刷新
+
+小程序中实现上拉加载更多的方式：
+
+- 在 app.json 或者 page.json 中开启允许下拉，同时可以配置窗口、loading 样式等
+- 在页面.js 中定义 onPullDownRefresh 事件监听用户下拉刷新
+
+**cart.json**
+
+```json
+{
+  "usingComponents": {},
+  "onReachBottomDistance": 100,
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#efefef",
+  "backgroundTextStyle": "dark"
+}
+```
+
+**cart.wxml**
+
+```wxml
+<view wx:for="{{numList}}" wx:key="item">{{item}}</view>
+```
+
+**cart.js**
+
+```js
+Page({
+  data: {
+    numList: [1, 2, 3],
+  },
+  // 上拉触底加载
+  onReachBottom() {
+    wx.showLoading({
+      title: '数据加载中...',
+    })
+
+    setTimeout(() => {
+      const newList = this.data.numList.slice(-3).map((item) => item + 3)
+      this.setData({
+        numList: [...this.data.numList, ...newList],
+      })
+
+      wx.hideLoading()
+    }, 1000)
+  },
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.setData({
+      numList: [1, 2, 3],
+    })
+
+    wx.stopPullDownRefresh()
+  },
+})
+```
+
+## 使用 scroll-view 实现上拉加载更多和下拉刷新功能
+
+```wxml
+<scroll-view
+  scroll-y
+  lower-threshold="100"
+  bindscrolltolower="scrolltolowerHandler"
+  refresher-enabled
+  refresher-default-style="black"
+  refresher-background="#efefef"
+  refresher-triggered="{{isTriggered}}"
+  bindrefresherrefresh="refreshHandler"
+>
+  <view wx:for="{{numList}}" wx:key="*this">{{item}}</view>
+</scroll-view>
+```
+
+```js
+Page({
+  data: {
+    numList: [1, 2, 3],
+    isTriggered: false,
+  },
+  // 下拉触底加载
+  scrolltolowerHandler() {
+    wx.showLoading({
+      title: '数据加载中...',
+    })
+
+    setTimeout(() => {
+      const newList = this.data.numList.slice(-3).map((item) => item + 3)
+      this.setData({
+        numList: [...this.data.numList, ...newList],
+      })
+
+      wx.hideLoading()
+    }, 1000)
+  },
+  // 上拉刷新
+  refreshHandler() {
+    this.setData({
+      numList: [1, 2, 3],
+      isTriggered: false,
+    })
+
+    wx.showToast({
+      title: '刷新成功',
+      icon: 'success',
+    })
+  },
+})
+```
+
+## 创建和注册组件
+
+开发中常见的组件主要分为公共组件和页面组件两种，因此注册组件的方式也分为两种：
+
+- 全局注册：在 app.json 文件中配置 usingComponents 进行注册，注册后可以在任意页面使用
+- 局部注册：在页面的 json 文件中配置 usingComponents 进行注册，注册后只能在当前页面使用
+
+在 usingComponents 中进行组件注册时，需要提供自定义组件的组件名和自定义组件文件路径
+
+在将组件注册好以后，直接将自定义组件的组件名当成组件标签名使用即可
+
+```json
+{
+  "usingComponents": {
+    "my-component-one": "/components/my-component-one/my-component-one"
+  }
+}
+```
+
+## 组件的数据以及方法
+
+组件数据和方法需要在组件.js 的 Component 方法中进行定义，Component 创建自定义组件
+
+- data：定义组件的内部数据
+- methods：在组件中事件处理程序需要写到 methods 中才可以
+
+```wxml
+<view>全局组件</view>
+<checkbox checked="{{isChecked}}" bind:tap="updateIsChecked" />
+```
+
+```js
+Component({
+  /**
+   * 组件的属性列表
+   */
+  properties: {},
+
+  /**
+   * 组件的初始数据
+   */
+  data: {
+    isChecked: false,
+  },
+
+  /**
+   * 组件的方法列表
+   */
+  methods: {
+    updateIsChecked() {
+      this.setData({
+        isChecked: !this.data.isChecked,
+      })
+    },
+  },
+})
+```
+
+## 组件的属性
+
+Properties 是指组件的对外属性，主要用来接收组件使用者传递给组件内部的数据，和 data 一同用于组件的模板渲染
+
+注意事项：
+
+- 设置属性类型需要使用 type 属性，属性类型是必填项，value 属性为默认值
+- 属性类型可以为 String、Number、Boolean、Object、Array，也可以为 null 表示不限制类型
+
+**category.wxml**
+
+```wxml
+<my-component-one content="我已阅读并同意用户协议、隐私协议" position="right">
+</my-component-one>
+
+<my-component-one content="匿名提交" position="left"></my-component-one>
+```
+
+**my-component-one.js**
+
+```js
+Component({
+  /**
+   * 组件的属性列表
+   */
+  properties: {
+    content: String,
+    position: {
+      type: String,
+      value: '',
+    },
+  },
+
+  /**
+   * 组件的初始数据
+   */
+  data: {
+    isChecked: false,
+  },
+
+  /**
+   * 组件的方法列表
+   */
+  methods: {
+    updateIsChecked() {
+      this.setData({
+        isChecked: !this.data.isChecked,
+      })
+
+      console.log(this.properties.content, this.properties.position)
+    },
+  },
+})
+```
+
+**my-component-one.wxml**
+
+```wxml
+<view class="{{position==='left'?'left':'right'}}">
+  <checkbox checked="{{isChecked}}" bind:tap="updateIsChecked" />
+  <view class="{{position==='left'?'container':''}}">
+    <text>{{position==="left"?'您对商家/菜品满意吗？':''}}</text>
+    <text>{{content}}</text>
+  </view>
+</view>
+```
+
+## 组件 wxml 的 slot 插槽
+
+在使用基础组件时，可以在组件中间写子节点，从而将子节点的内容展示到页面中，自定义组件也可以接收子节点，只不过在组件模板中需要定义 `<slot/>` 节点，用于承载组件中间的子节点
+
+默认情况下，一个组件的 wxml 中只能有一个 slot(默认插槽)，需要使用多插槽时，可以在 js 中声明启用
+
+同时需要给 slot 添加 name 属性来区分不同的 slot(具名插槽)
+
+然后给子节点内容添加 slot 属性，属性值是对应 slot 的 name 名称，从而将内容插入到对应的 slot 中
+
+**cart.wxml**
+
+```wxml
+<custom-one>
+  <view slot="header">头部内容</view>
+  <view>主要内容</view>
+  <view slot="footer">底部内容</view>
+</custom-one>
+```
+
+**custom-one.wxml**
+
+```wxml
+<slot name="header"></slot>
+<slot></slot>
+<slot name="footer"></slot>
+```
+
+**custom-one.js**
+
+```js
+Component({
+  options: {
+    multipleSlots: true,
+  },
+})
+```
+
+## 组件样式以及注意事项
+
+自定义组件拥有自己的 wxss 样式，组件 wxss 文件的样式，默认只对当前组件生效
+
+编写组件样式时，需要注意以下几点：
+
+- app.wxss 或页面的 wxss 中使用了标签名(view)选择器(或一些其他特殊选择器)来直接指定样式，这些选择器会影响到页面和全部组件，通常情况下这是不推荐的做法
+- 组件和引用组件的页面不能使用 id 选择器、属性选择器和标签选择器，请改用 class 选择器
+- 组件和引用组件的页面中使用后代选择器在一些极端情况下会有非预期的表现，如果遇到请避免使用
+- 子元素选择器只能用于 view 组件与其子节点之间，用于其他组件可能导致非预期的情况
+- 继承样式，如 font、color，会从组件外继承到组件内
+- 除继承样式外，全局中的样式、组件所在的页面的样式对自定义组件无效(除非更改组件样式隔离选项)
+
+## 组件样式隔离
+
+默认情况下，自定义组件的样式只受自身 wxss 的影响，但是有时候我们需要组件使用者的样式的样式能够影响到组件，这时候就需要指定特殊的样式隔离选项 styleIsolation，选择它支持以下取值：
+
+- isolate：表示启用样式隔离，在自定义组件内外，使用 class 指定的样式将不会相互影响(一般情况下的默认值)
+- apply-shared：表示页面 wxss 样式将影响到自定义组件，但自定义组件 wxss 中指定的样式不会影响页面
+- shared：表示页面 wxss 样式将影响到自定义组件，自定义组件 wxss 中指定的元素也会影响页面和其他设置了 apply-shared 或 shared 的自定义组件
+
+```js
+Component({
+  options: {
+    styleIsolation: 'shared',
+  },
+})
+```
