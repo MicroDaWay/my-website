@@ -473,7 +473,7 @@ sidebar_position: 7
       - 在类中通过 xxx(){}方式添加的方法，位于原型中
       - 主动向原型中添加的属性或方法
 
-![JS008.png](../../static/img/JS008.png)
+![JS08.png](../../static/img/JS08.png)
 
 ```html
 <!DOCTYPE html>

@@ -1792,7 +1792,7 @@ sidebar_position: 10
   - 因为调用栈中有可能会存在一些还没有执行完的代码
   - 事件触发后，JS 引擎是将事件响应函数插入到消息队列中排队
 
-![JS013.png](../../static/img/JS013.png)
+![JS13.png](../../static/img/JS13.png)
 
 ```html
 <!DOCTYPE html>
@@ -1823,7 +1823,7 @@ sidebar_position: 10
 </html>
 ```
 
-![JS014.png](../../static/img/JS014.png)
+![JS14.png](../../static/img/JS14.png)
 
 ```html
 <!DOCTYPE html>

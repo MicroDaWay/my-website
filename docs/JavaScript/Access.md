@@ -132,7 +132,7 @@ sidebar_position: 1
 
 - 变量中并不存储任何值，而是存储值的内存地址！
 
-![JS001.png](../../static/img/JS001.png)
+![JS01.png](../../static/img/JS01.png)
 
 ## 常量
 

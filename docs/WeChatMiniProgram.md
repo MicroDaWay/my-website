@@ -1231,6 +1231,57 @@ Component({
 - apply-shared：表示页面 wxss 样式将影响到自定义组件，但自定义组件 wxss 中指定的样式不会影响页面
 - shared：表示页面 wxss 样式将影响到自定义组件，自定义组件 wxss 中指定的元素也会影响页面和其他设置了 apply-shared 或 shared 的自定义组件
 
+```wxml
+<view class="outer {{position==='left'?'left':'right'}}">
+  <checkbox checked="{{isChecked}}" bind:tap="updateIsChecked" />
+  <view class="{{position==='left'?'container':''}}">
+    <text>{{position==="left"?'您对商家/菜品满意吗？':''}}</text>
+    <text wx:if="{{content}}">{{content}}</text>
+    <slot wx:else></slot>
+  </view>
+</view>
+```
+
+```scss
+.outer {
+  display: flex;
+  align-items: center;
+
+  .wx-checkbox-input {
+    width: 30rpx;
+    height: 30rpx;
+    border-radius: 50%;
+    border: 1px solid orange;
+  }
+
+  .wx-checkbox-input-checked {
+    width: 30rpx;
+    height: 30rpx;
+    border-radius: 50%;
+    border: 1px solid orange;
+
+    &::before {
+      color: red;
+    }
+  }
+
+  &.right {
+    flex-direction: row;
+  }
+
+  &.left {
+    flex-direction: row-reverse;
+  }
+
+  .container {
+    flex: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+```
+
 ```js
 Component({
   options: {
@@ -1238,3 +1289,437 @@ Component({
   },
 })
 ```
+
+## 数据监听器
+
+数据监听器主要用于监听和响应任何属性(properties)和数据(data)的变化，当数据发生变化时就会触发对应回调函数，从而方便开发者进行业务逻辑的处理
+
+在组件中如果需要进行数据监听，需要使用 observers 字段
+
+**cart.wxml**
+
+```wxml
+<custom-four test="测试"></custom-four>
+```
+
+**custom-four.wxml**
+
+```wxml
+<view>num：{{num}}</view>
+<view>count：{{count}}</view>
+<view>{{obj.name}} {{obj.age}}</view>
+<view>arr[1]：{{arr[1]}}</view>
+<view>{{test}}</view>
+
+<button type="primary" bind:tap="clickHandler">点我一下</button>
+```
+
+**custom-four.js**
+
+```js
+Component({
+  /**
+   * 组件的属性列表
+   */
+  properties: {
+    test: {
+      type: String,
+      value: '',
+    },
+  },
+  // 用来监听数据以及属性是否发生了变化
+  observers: {
+    // 监听单个数据
+    // num: function (newNum) {
+    //   console.log(newNum)
+    // },
+    // count: function (newCount) {
+    //   console.log(newCount)
+    // },
+    // 监听多个数据
+    // 'num,count': function (newNum, newCount) {
+    //   console.log(newNum, newCount)
+    // },
+    // 监听单个属性
+    // 'arr[1]': function (value) {
+    //   console.log(value)
+    // },
+    // 监听多个属性
+    // 'obj.name,obj.age': function (newName, newAge) {
+    //   console.log(newName, newAge)
+    // },
+    // 使用通配符，监听对象中所有属性的变化
+    // 'obj.**': function (newObj) {
+    //   console.log(newObj)
+    // },
+    // 监听properties
+    test: function (newTest) {
+      console.log(newTest)
+    },
+  },
+
+  /**
+   * 组件的初始数据
+   */
+  data: {
+    num: 10,
+    count: 100,
+    obj: {
+      name: '孙悟空',
+      age: 18,
+    },
+    arr: [1, 2, 3],
+  },
+
+  /**
+   * 组件的方法列表
+   */
+  methods: {
+    clickHandler() {
+      this.setData({
+        num: this.data.num + 1,
+        count: this.data.count + 1,
+        'arr[1]': this.data.arr[1] + 1,
+        'obj.name': '猪八戒',
+        'obj.age': this.data.obj.age + 1,
+        test: '哈哈',
+      })
+    },
+  },
+})
+```
+
+## 组件通信-父往子传值
+
+父组件如果需要向子组件传递数据，只需要两个步骤：
+
+- 在父组件 wxml 中使用数据绑定的方式向子组件传递动态数据
+- 子组件内部使用 properties 接收父组件传递的数据即可
+
+**category.wxml**
+
+```wxml
+<my-component-one position="right" checked="{{checked}}">
+  我已阅读并同意用户协议和隐私协议
+</my-component-one>
+
+<my-component-one position="left">
+  匿名提交
+</my-component-one>
+```
+
+**category.js**
+
+```js
+Page({
+  data: {
+    checked: false,
+  },
+})
+```
+
+**my-component-one.wxml**
+
+```wxml
+<view class="outer {{position==='left'?'left':'right'}}">
+  <checkbox checked="{{isChecked}}" bind:tap="updateIsChecked" />
+  <view class="{{position==='left'?'container':''}}">
+    <text>{{position==="left"?'您对商家/菜品满意吗？':''}}</text>
+    <text wx:if="{{content}}">{{content}}</text>
+    <slot wx:else></slot>
+  </view>
+</view>
+```
+
+**my-component-one.js**
+
+```js
+Component({
+  options: {
+    styleIsolation: 'shared',
+  },
+  properties: {
+    content: String,
+    position: {
+      type: String,
+      value: '',
+    },
+    checked: {
+      type: Boolean,
+      value: false,
+    },
+  },
+  observers: {
+    checked: function (value) {
+      this.setData({
+        isChecked: value,
+      })
+    },
+  },
+  data: {
+    isChecked: false,
+  },
+  methods: {
+    updateIsChecked() {
+      this.setData({
+        isChecked: !this.data.isChecked,
+      })
+    },
+  },
+})
+```
+
+## 组件通信-子往父传值
+
+子组件如果需要向父组件传递数据，可以通过小程序提供的事件系统实现，可以传递任意数据
+
+- 自定义组件内部使用 triggerEvent 方法触发一个自定义事件，同时可以携带数据
+- 自定义组件标签上通过 bind 方法监听发射的事件，同时绑定事件处理函数，在事件函数中通过事件对象获取传递的数据
+
+**my.wxml**
+
+```wxml
+<custom-five num="{{num}}" bind:updatenum="updateNum"></custom-five>
+```
+
+**my.js**
+
+```js
+Page({
+  data: {
+    num: 1,
+  },
+  updateNum(e) {
+    this.setData({
+      num: e.detail,
+    })
+  },
+})
+```
+
+**custom-five.wxml**
+
+```wxml
+<view>{{num}}</view>
+<button type="primary" plain bind:tap="clickHandler">子组件修改父组件的值</button>
+```
+
+**custom-five.js**
+
+```js
+Component({
+  properties: {
+    num: {
+      type: Number,
+    },
+  },
+  methods: {
+    clickHandler() {
+      this.triggerEvent('updatenum', this.properties.num + 1)
+    },
+  },
+})
+```
+
+## 组件通信-获取组件实例
+
+父组件可以通过 this.selectComponent 方法获取子组件实例对象，这样就可以直接访问子组件的任意数据和方法
+
+this.selectComponent 方法在调用时需要传入一个匹配选择器 selector
+
+**category.wxml**
+
+```wxml
+<my-component-one
+  class="child"
+  position="right"
+  isChecked="{{isChecked}}"
+  bindchangechecked="changeChecked"
+>
+  我已阅读并同意用户协议和隐私协议
+</my-component-one>
+
+<button type="primary" plain bind:tap="clickHandler">获取子组件实例对象</button>
+```
+
+**category.js**
+
+```js
+Page({
+  data: {
+    isChecked: false,
+  },
+  changeChecked(e) {
+    this.setData({
+      isChecked: e.detail,
+    })
+  },
+  clickHandler() {
+    const res = this.selectComponent('.child')
+    console.log(res.data.isChecked)
+  },
+})
+```
+
+**my-component-one.wxml**
+
+```wxml
+<view class="outer {{position==='left'?'left':'right'}}">
+  <checkbox checked="{{isChecked}}" bind:tap="updateIsChecked" />
+  <view class="{{position==='left'?'container':''}}">
+    <text>{{position==="left"?'您对商家/菜品满意吗？':''}}</text>
+    <text wx:if="{{content}}">{{content}}</text>
+    <slot wx:else></slot>
+  </view>
+</view>
+```
+
+**my-component-one.js**
+
+```js
+Component({
+  options: {
+    styleIsolation: 'shared',
+  },
+  properties: {
+    content: String,
+    position: {
+      type: String,
+      value: '',
+    },
+    isChecked: {
+      type: Boolean,
+      value: false,
+    },
+  },
+  methods: {
+    updateIsChecked() {
+      this.triggerEvent('changechecked', !this.properties.isChecked)
+    },
+  },
+})
+```
+
+## 组件生命周期
+
+组件的生命周期：指的是组件自身的一些钩子函数，这些函数在特定的时间节点被自动触发
+
+组件的生命周期函数需要在 lifetimes 字段内进行声明
+
+组件的声明周期函数有 5 个：created、attached、ready、moved、detached
+
+![微信小程序组件生命周期函数](../static/img/微信小程序组件生命周期函数.png)
+
+**注意事项：created 钩子函数中不能调用 setData**
+
+**my.wxml**
+
+```wxml
+<custom-six wx:if="{{num===1}}"></custom-six>
+
+<button type="warn" plain bind:tap="clickHandler">销毁自定义组件</button>
+```
+
+**my.js**
+
+```js
+Page({
+  data: {
+    num: 1,
+  },
+  clickHandler() {
+    this.setData({
+      num: this.data.num + 1,
+    })
+  },
+})
+```
+
+**custom-six.wxml**
+
+```wxml
+<view>{{name}}</view>
+```
+
+**custom-six.js**
+
+```js
+Component({
+  data: {
+    name: '孙悟空',
+  },
+  lifetimes: {
+    created() {
+      this.test = '测试'
+      console.log('created')
+    },
+    attached() {
+      this.setData({
+        name: '猪八戒',
+      })
+      console.log('attached', this.test)
+    },
+    detached() {
+      console.log('detached')
+    },
+  },
+})
+```
+
+## 组件所在页面的生命周期
+
+组件还有一些特殊的生命周期，这类生命周期和组件没有很强的关联
+
+主要用于组件内部监听父组件的展示、隐藏状态，从而方便组件内部执行一些业务逻辑的处理
+
+组件所在页面的生命周期有 4 个：show、hide、resize、routeDone、需要在 pageLifetimes 字段内进行声明
+
+- show：组件所在的页面被展示时执行
+- hide：组件所在的页面被隐藏时执行
+
+```js
+Component({
+  data: {
+    name: '孙悟空',
+  },
+  lifetimes: {
+    created() {
+      this.test = '测试'
+      // console.log('created')
+    },
+    attached() {
+      this.setData({
+        name: '猪八戒',
+      })
+      // console.log('attached', this.test)
+    },
+    detached() {
+      // console.log('detached')
+    },
+  },
+  pageLifetimes: {
+    show() {
+      console.log('show')
+    },
+    hide() {
+      console.log('hide')
+    },
+  },
+})
+```
+
+## 小程序生命周期总结
+
+一个小程序完整的生命周期由应用生命周期、页面生命周期和组件生命周期三部分来组成
+
+**小程序冷启动，钩子函数执行的顺序**
+
+![微信小程序生命周期总结01](../static/img/微信小程序生命周期总结01.png)
+
+**保留当前页面，进入下一个页面，钩子函数执行的顺序&销毁当前页面，进入下一个页面，钩子函数执行的顺序**
+
+![微信小程序生命周期总结02](../static/img/微信小程序生命周期总结02.png)
+
+**小程序热启动，钩子函数执行的顺序**
+
+![微信小程序生命周期总结03](../static/img/微信小程序生命周期总结03.png)

@@ -420,8 +420,8 @@ for(let 变量 of 可迭代的对象){
 - 复制必须要产生新的对象
 - 当调用 slice 时，会产生一个新的数组对象，从而完成对数组的复制
 
-![JS009.png](../../static/img/JS009.png)
-![JS010.png](../../static/img/JS010.png)
+![JS09.png](../../static/img/JS09.png)
+![JS10.png](../../static/img/JS10.png)
 
 ```html
 <!DOCTYPE html>
@@ -464,8 +464,8 @@ for(let 变量 of 可迭代的对象){
   - 深拷贝指不仅复制对象本身，还复制对象中的属性和元素
   - 因为性能问题，通常情况不太使用深拷贝
 
-![JS011.png](../../static/img/JS011.png)
-![JS012.png](../../static/img/JS012.png)
+![JS11.png](../../static/img/JS11.png)
+![JS12.png](../../static/img/JS12.png)
 
 ```html
 <!DOCTYPE html>

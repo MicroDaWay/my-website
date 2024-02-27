@@ -213,9 +213,9 @@ sidebar_position: 5
     - 当对两个对象进行相等或全等比较时，比较的是对象的内存地址
     - 如果有两个变量同时指向一个对象，通过一个变量修改对象时，对另外一个变量也会产生影响
 
-![JS004.png](../../static/img/JS004.png)
-![JS005.png](../../static/img/JS005.png)
-![JS006.png](../../static/img/JS006.png)
+![JS04.png](../../static/img/JS04.png)
+![JS05.png](../../static/img/JS05.png)
+![JS06.png](../../static/img/JS06.png)
 
 ```html
 <!DOCTYPE html>
@@ -257,7 +257,7 @@ sidebar_position: 5
 - 注意：
   - const 只是禁止变量被重新赋值，对对象的修改没有任何影响
 
-![JS007.png](../../static/img/JS007.png)
+![JS07.png](../../static/img/JS07.png)
 
 ```html
 <!DOCTYPE html>
