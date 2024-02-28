@@ -1723,3 +1723,268 @@ Component({
 **小程序热启动，钩子函数执行的顺序**
 
 ![微信小程序生命周期总结03](../static/img/微信小程序生命周期总结03.png)
+
+## 使用 Component 构造页面
+
+Component 方法用于创建自定义组件
+
+小程序页面也可以视为自定义组件，因此页面也可以使用 Component 方法进行创建，从而实现复杂的页面逻辑开发
+
+注意事项：
+
+- 要求对应 json 文件中包含 usingComponents
+- 页面使用 Component 构造器创建，需要定义与普通组件一样的字段与实例方法
+- 页面 Page 中的一些生命周期方法(如 onLoad 等)，在 Component 中要写在 methods 属性中才能生效
+- 组件的属性 Properties 可以用于接收页面的参数，在 onLoad()中可以通过 this.data 拿到对应的页面参数
+
+**my.wxml**
+
+```wxml
+<navigator
+  url="/pages/details/details?age=18&gender=男"
+  open-type="navigate"
+>
+  跳转到details
+</navigator>
+```
+
+**details.wxml**
+
+```wxml
+<view>details页面</view>
+<view>{{name}}</view>
+
+<button type="primary" plain bind:tap="updateName">点我一下</button>
+```
+
+**details.js**
+
+```js
+Component({
+  properties: {
+    age: Number,
+    gender: String,
+  },
+  data: {
+    name: '孙悟空',
+  },
+  methods: {
+    updateName() {
+      this.setData({
+        name: '猪八戒',
+      })
+    },
+    onLoad(option) {
+      // console.log('details页面 onLoad')
+      // console.log(option)
+      console.log(this.properties.age, this.properties.gender)
+    },
+  },
+})
+```
+
+## 组件复用机制 behaviors
+
+小程序的 behaviors 方法是一种代码复用的方式，可以将一些通用的逻辑和方法提取出来，然后在多个组件中复用，从而减少代码冗余，提高代码的可维护性
+
+如果需要 behavior 复用代码，需要使用 Behavior() 方法，每个 behavior 可以包含一组属性、数据、生命周期函数的方法，组件引用它时，它的属性、数据和方法会被合并到组件中，生命周期函数也会在对应时机被调用
+
+组件和它引用的 behavior 中可以包含同名的字段，对这些字段的处理方法如下：
+
+- 如果有同名的属性和方法，采用就近原则，组件会覆盖 behavior 中的同名属性和方法
+- 如果有同名的数据字段且都是对象类型，会进行对象合并，其余情况会采用就近原则进行数据覆盖
+- 生命周期函数和 observers 不会相互覆盖，会是在对应触发时机被逐个调用，也就是都会被执行
+
+**my.wxml**
+
+```wxml
+<custom-eight></custom-eight>
+```
+
+**custom-eight.wxml**
+
+```wxml
+<view>自定义组件</view>
+<view>{{label}}</view>
+<view>{{name}}</view>
+<view>{{obj.name}}</view>
+<view>{{obj.age}}</view>
+
+<button type="primary" plain bind:tap="updateName">点我一下</button>
+```
+
+**behavior.js**
+
+```js
+const behavior = Behavior({
+  properties: {
+    label: {
+      type: String,
+      value: '标签',
+    },
+  },
+  data: {
+    name: '孙悟空',
+    obj: {
+      name: '猪八戒',
+    },
+  },
+  methods: {
+    updateName() {
+      this.setData({
+        name: '沙和尚',
+      })
+
+      console.log('behavior中的方法')
+    },
+  },
+  lifetimes: {
+    attached() {
+      console.log('behavior中的生命周期函数')
+    },
+  },
+})
+
+export default behavior
+```
+
+**custom-eight.js**
+
+```js
+import behavior from './behavio'
+
+Component({
+  behaviors: [behavior],
+  properties: {
+    label: {
+      type: String,
+      value: '哈哈',
+    },
+  },
+  data: {
+    name: '组件中的name',
+    obj: {
+      name: '组件中的obj name',
+      age: 18,
+    },
+  },
+  methods: {
+    updateName() {
+      console.log('组件内部的方法')
+    },
+  },
+  lifetimes: {
+    attached() {
+      console.log('组件内部的生命周期函数')
+    },
+  },
+})
+```
+
+## 外部样式类
+
+默认情况下，组件和组件使用者之间如果存在相同的类名不会相互影响，组件使用者如果想修改组件的样式，就需要解除样式隔离，但是解除样式隔离以后，在极端情况下，会产生样式冲突、CSS 嵌套太深等问题，从而给我们的开发带来一定的麻烦
+
+外部样式类：在使用组件时，组件使用者可以给组件传入 CSS 类名，通过传入的类名修改组件的样式
+
+如果需要使用外部样式类修改组件的样式，在 Component 中需要用 externalClasses 定义若干个外部样式类
+
+外部样式类的使用步骤：
+
+- 在 Component 中用 externalClasses 定义若干个外部样式类
+- 自定义组件标签通过属性绑定的方式提供一个样式类，属性是 externalClasses 定义的元素，属性值是传递的类名
+- 将接受到的样式类用于自定义组件内部
+
+注意事项：
+
+- 在同一个节点上使用普通样式类和外部样式类时，两个类的优先级是未定义的，因此需要添加!important 以保证外部样式类的优先级
+- 如果 styleIsolation 属性值是 shared，这时候 externalClasses 选项将会失效
+
+**my.wxml**
+
+```wxml
+<custom-nine external-class="test test2"></custom-nine>
+```
+
+**my.scss**
+
+```scss
+.test {
+  color: red !important;
+}
+
+.test2 {
+  background-color: #bfa;
+}
+```
+
+**custom-nine.wxml**
+
+```wxml
+<view class="external-class box">自定义组件</view>
+```
+
+**custom-nine.scss**
+
+```scss
+.box {
+  color: deepskyblue;
+}
+```
+
+**custom-nine.js**
+
+```js
+Component({
+  externalClasses: ['external-class'],
+})
+```
+
+## 使用 npm 包
+
+目前小程序已经支持使用 npm 安装第三方包，因为 node_modules 目录中的包不会参与小程序项目的编译、上传和打包，因此在小程序项目中要使用的 npm 包，必须走一遍构建 npm 的过程
+
+在构建成功以后，默认会在小程序项目根目录，也就是 node_modules 同级目录下生成 miniprogram_npm 目录，里面存放着构建完成以后的 npm 包，也就是小程序运行过程中真正使用的包
+
+注意事项：
+
+- 小程序运行在微信内部，因为运行环境的特殊性，这就导致并不是所有的包都能够在小程序使用
+- 我们在小程序中提到的包指专为小程序定制的 npm 包，简称小程序 npm 包，在使用包之前需要先确定该包是否支持小程序
+- 开发者如果需要发布小程序包，需要参考官方规范：https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#%E5%8F%91%E5%B8%83-npm-%E5%8C%85
+
+## 自定义构建 npm
+
+在实际的开发中，随着项目的功能越来越多，项目越来越复杂，文件目录也变得很繁琐，为了方便进行项目的开发，开发人员通常会对目录结构进行调整优化，例如：将小程序源码放到 miniprogram 目录下
+
+这时候需要开发者在 project.config.json 中指定 node_modules 的位置和目标 miniprogram_npm 的位置
+
+具体配置如下：
+
+- 配置 project.config.json 的 miniprogramRoot 指定小程序源码的目录
+- 配置 project.config.json 的 setting.packNpmManually 为 true，开启自定义 node_modules 和 miniprogram_npm 位置的构建 npm 方式
+- 配置 project.config.json 的 setting.packNpmRelationList 项，指定 packageJsonPath 和 miniprogramNpmDistDir 的位置
+
+**project.config.json**
+
+```json
+{
+  "miniprogramRoot": "./miniprogram",
+  "setting": {
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./miniprogram"
+      }
+    ]
+  }
+}
+```
+
+## Vant Weapp 组件样式覆盖
+
+Vant Weapp 基于微信小程序的机制，为开发者提供了三种修改组件样式的方法
+
+- 解除样式隔离：在页面中使用 Vant Weapp 组件时，可直接在页面的样式文件中覆盖样式
+- 使用外部样式类：需要注意的是普通样式类和外部样式类的优先级是未定义的，使用时需要添加!important 保证外部样式类的优先级
+- 使用 CSS 变量：在页面或全局对多个组件的样式做批量修改以进行主题样式的定制
