@@ -550,7 +550,7 @@ https://developers.weixin.qq.com/miniprogram/dev/reference/api/App.html#onLaunch
 ```js
 App({
   /**
-   * 当小程序初始化完成时，会触发 onLaunch（全局只触发一次）
+   * 当小程序初始化完成时，会触发 onLaunch(全局只触发一次)
    */
   onLaunch: function () {
     console.log('onLaunch')
@@ -1988,3 +1988,577 @@ Vant Weapp 基于微信小程序的机制，为开发者提供了三种修改组
 - 解除样式隔离：在页面中使用 Vant Weapp 组件时，可直接在页面的样式文件中覆盖样式
 - 使用外部样式类：需要注意的是普通样式类和外部样式类的优先级是未定义的，使用时需要添加!important 保证外部样式类的优先级
 - 使用 CSS 变量：在页面或全局对多个组件的样式做批量修改以进行主题样式的定制
+
+## 小程序分包加载
+
+小程序的代码通常是由许多页面、组件以及资源等组成，随着小程序功能的增加，代码量也会逐渐增加，体积过大就会导致用户打开速度变慢，影响用户的使用体验
+
+分包加载是一种小程序优化技术，将小程序不同功能的代码，分别打包成不同的子包，在构建时打包成不同的分包，使用在使用时按需进行加载，在构建小程序分包项目时，构建会输出一个或多个分包，每个使用分包小程序含有一个主包
+
+- 主包：包含默认启动页面/tabBar 页面以及所有分包都需要用到的公共资源包
+- 分包：根据开发者的配置进行划分出来的子包
+
+分包后加载顺序：在小程序启动时，默认会下载主包并启动主包内页面，当用户进入分包内某个页面时，微信客户端会把对应分包下载下来，下载完成后再进行展示
+
+目前小程序分包大小有以下限制：
+
+- 整个小程序所有分包大小不超过 20M(开通虚拟支付后的小游戏不超过 30M)
+- 单个分包/主包大小不能超过 2M
+
+## 配置分包加载以及打包、引用原则
+
+小程序如果需要进行分包加载，需要在 app.json 中，通过 subPackages 定义分包结构
+
+每个分包结构含三个常用字段：
+
+- root：分包的根目录，该目录下的所有文件都会被打包成一个独立的包
+- name：分包的别名，用于在代码中引用该分包
+- pages：指定当前分包中包含哪些页面
+
+打包原则：
+
+- tabBar 页面必须在主包内
+- 最外层的 pages 字段，属于主包的包含页面
+- 按 subPackages 配置路径进行打包，配置路径外的目录将被打包到主包中
+- 分包之间不能相互嵌套，subPackage 的根目录不能是另外一个 subPackage 内的子目录
+
+引用原则：
+
+- 主包不可以引用分包的资源，但分包可以使用主包的公共资源
+- 分包与主包之间资源无法相互引用，分包异步化时不受此条限制
+
+**app.json**
+
+```json
+{
+  "pages": ["pages/index/index", "pages/category/category", "pages/cart/cart", "pages/my/my"],
+  "tabBar": {
+    "selectedColor": "#f3514f",
+    "color": "#666",
+    "borderStyle": "black",
+    "position": "bottom",
+    "list": [
+      {
+        "text": "首页",
+        "pagePath": "pages/index/index",
+        "iconPath": "/assets/tabbar/index.png",
+        "selectedIconPath": "/assets/tabbar/index-selected.png"
+      },
+      {
+        "text": "分类",
+        "pagePath": "pages/category/category",
+        "iconPath": "/assets/tabbar/category.png",
+        "selectedIconPath": "/assets/tabbar/category-selected.png"
+      },
+      {
+        "text": "购物车",
+        "pagePath": "pages/cart/cart",
+        "iconPath": "/assets/tabbar/cart.png",
+        "selectedIconPath": "/assets/tabbar/cart-selected.png"
+      },
+      {
+        "text": "我的",
+        "pagePath": "pages/my/my",
+        "iconPath": "/assets/tabbar/my.png",
+        "selectedIconPath": "/assets/tabbar/my-selected.png"
+      }
+    ]
+  },
+  "subPackages": [
+    {
+      "root": "modules/goodsModule",
+      "name": "goodsModule",
+      "pages": ["pages/list/list", "pages/details/details"]
+    }
+  ]
+}
+```
+
+**my.wxml**
+
+```wxml
+<navigator url="/modules/goodsModule/pages/list/list">
+  跳转到list
+</navigator>
+```
+
+## 独立分包
+
+独立分包：是指能够独立于主包和其他分包运行的包
+
+从独立分包页面进行小程序时，不需要下载主包，当用户进入普通分包或主包内页面时，主包才会被下载
+
+开发者可以将功能相对独立的页面配置到独立分包中，因此独立分包不依赖主包就可以运行，可以很大程度上提升分包页面的启动速度
+
+给 subPackages 定义的分包结构添加 independent 字段，即可声明对应分包为独立分包
+
+注意事项：
+
+- 独立分包中不能依赖主包和其他分包中的资源
+- 主包中的 app.wxss 对独立分包无效
+- App 只能在主包内对应，独立分包中不能定义 App，会造成无法预期的行为
+
+**app.json**
+
+```json
+{
+  "subPackages": [
+    {
+      "root": "modules/goodsModule",
+      "name": "goodsModule",
+      "pages": ["pages/list/list", "pages/details/details"]
+    },
+    {
+      "root": "modules/marketModule",
+      "name": "marketModule",
+      "pages": ["pages/market/market"],
+      "independent": true
+    }
+  ]
+}
+```
+
+## 分包预下载
+
+分包预下载是指访问小程序某个页面时，预先下载其他分包中的代码和资源，当用户需要访问分包中的页面时，已经预先下载好代码和资源，因此可以直接使用，从而提高用户的使用体验
+
+小程序的分包预下载需要在 app.json 中通过 preloadRule 字段设置预下载规则
+
+preloadRule 是一个对象，对象的 key 表示访问哪个路径时进行预下载，value 是进入此页面的预下载配置，具有两个配置项：
+
+- packages：进入页面后预下载分包的 root 或 name，`__APP__` 表示主包
+- network：在指定网络下预下载，可选值为：all(不限网络)、wifi(仅 wifi 下预下载)
+
+**app.json**
+
+```json
+{
+  "subPackages": [
+    {
+      "root": "modules/goodsModule",
+      "name": "goodsModule",
+      "pages": ["pages/list/list", "pages/details/details"]
+    },
+    {
+      "root": "modules/marketModule",
+      "name": "marketModule",
+      "pages": ["pages/market/market"],
+      "independent": true
+    }
+  ],
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["modules/goodsModule"]
+    },
+    "modules/goodsModule/pages/list/list": {
+      "network": "all",
+      "packages": ["__APP__"]
+    }
+  }
+}
+```
+
+## 获取微信头像
+
+想使用微信提供的头像填写能力，需要两步：
+
+- 将 button 组件 open-type 的值设置为 chooseAvatar
+- 通过 bindchooseavatar 事件回调获取到头像信息的临时路径
+
+**my.wxml**
+
+```wxml
+<view>
+  <button class="btn" open-type="chooseAvatar" bindchooseavatar="chooseAvatar">
+    <image class="img" src="{{avatarUrl}}" mode="" />
+  </button>
+</view>
+```
+
+**my.scss**
+
+```scss
+.btn {
+  background-color: transparent;
+
+  &::after {
+    border: none;
+  }
+
+  .img {
+    width: 200rpx;
+    height: 200rpx;
+    border-radius: 50%;
+  }
+}
+```
+
+**my.js**
+
+```js
+Page({
+  data: {
+    avatarUrl: '../../assets/img/01.jpg',
+  },
+  chooseAvatar(e) {
+    this.setData({
+      avatarUrl: e.detail.avatarUrl,
+    })
+  },
+})
+```
+
+## 获取微信昵称
+
+想使用微信提供的昵称填写能力，需要三步：
+
+- 通过 form 组件中包裹住 input 以及 form-type 为 submit 的 button 组件
+- 需要将 input 组件的 type 属性设置为 nickname，当用户输入框输入时，键盘上方会展示微信昵称
+- 给 form 绑定 submit 事件，在事件处理函数中通过事件对象获取用户昵称
+
+**my.wxml**
+
+```wxml
+<form bindsubmit="submitHandler">
+  <input type="nickname" name="nickname" placeholder="请输入昵称" />
+  <button class="nickname-btn" type="primary" plain form-type="submit">点击获取昵称</button>
+</form>
+```
+
+**my.js**
+
+```js
+Page({
+  // 获取微信昵称
+  submitHandler(e) {
+    console.log(e.detail.value.nickname)
+  },
+})
+```
+
+## 转发功能
+
+想实现转发功能，有两种方式：
+
+- 页面 js 文件必须声明 onShareAppMessage 事件监听函数，并自定义转发内容，只有定义了此事件处理函数，右上角菜单才会显示转发按钮
+- 通过给 button 组件设置属性 open-type="share"，可以在用户点击按钮后触发 Page.onShareAppMessage 事件监听函数
+
+**my.wxml**
+
+```wxml
+<button open-type="share" type="primary" plain>转发</button>
+```
+
+**my.js**
+
+```js
+Page({
+  onShareAppMessage(obj) {
+    console.log(obj)
+
+    return {
+      title: '这是一个非常棒的小程序',
+      path: '/pages/my/my',
+      imageUrl: '../../assets/img/01.jpg',
+    }
+  },
+})
+```
+
+## 分享到朋友圈
+
+小程序页面默认不能被分享到朋友圈，开发者需主动设置分享到朋友圈才可以，实现分享到朋友圈需要满足两个条件：
+
+- 页面必须设置允许发送给朋友，页面 js 文件声明 onShareAppMessage 事件监听函数
+- 页面必须设置允许分享到朋友圈，页面 js 文件声明 onShareTimeline 事件监听函数
+
+**my.js**
+
+```js
+Page({
+  // 转发功能
+  onShareAppMessage(obj) {
+    console.log(obj)
+
+    return {
+      title: '这是一个非常棒的小程序',
+      path: '/pages/my/my',
+      imageUrl: '../../assets/img/01.jpg',
+    }
+  },
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '测试分享到朋友圈',
+      query: 'name=Tom',
+      imageUrl: '../../assets/img/03.jpg',
+    }
+  },
+})
+```
+
+## 手机号验证组件
+
+手机号验证组件，用于帮助开发者向用户发起手机号申请，必须经过用户同意后，才能获得由平台验证后的手机号，进而为用户提供相应服务，手机号验证组件分为两种：手机号快速验证组件以及手机号实时验证组件
+
+手机号快速验证组件：平台会对号码进行验证，但不保证是实时验证，`<button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">获取手机号</button>`
+
+手机号实时验证组件：在每次请求时，平台均会对用户选择的手机号进行实时验证，`<button open-type="getRealtimePhoneNumber" bindgetrealtimephonenumber="getRealtimePhoneNumber">获取手机号</button>"`
+
+注意事项：
+
+- 目前该接口针对非个人开发者，且完成了认证的小程序开发(不包含海外主体)
+- 两种验证组件需要付费使用，每个小程序账号将有 1000 次体验额度
+
+**my.wxml**
+
+```wxml
+<button type="primary" plain open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
+  快速验证组件
+</button>
+
+<button type="warn" plain open-type="getRealtimePhoneNumber" bindgetrealtimephonenumber="getRealtimePhoneNumber">
+  实时验证组件
+</button>
+```
+
+**my.js**
+
+```js
+Page({
+  // 快速验证组件
+  getPhoneNumber(e) {
+    console.log(e)
+  },
+  // 实时验证组件
+  getRealtimePhoneNumber(e) {
+    console.log(e)
+  },
+})
+```
+
+## 客服功能
+
+小程序为开发者提供了客服能力，同时为客服人员提供移动端、网页端客服工作台便于及时处理消息，使用方式：
+
+- 需要将 button 组件 open-type 属性设置为 contact，当用户点击后就会进入客服会话
+- 在微信公众号后台，绑定后的客服账号，可以登录网页端客服或移动端小程序客服接收、发送客服消息
+
+**my.wxml**
+
+```wxml
+<button type="primary" plain open-type="contact">客服</button>
+```
+
+## 框架接口 getApp()
+
+在小程序中，可以通过 getApp() 方法获取到小程序全局唯一的 App 实例，因此在 App() 方法中添加全局共享的数据、方法，从而实现页面、组件的数据传值
+
+注意事项：
+
+- 不要在 App() 方法中使用 getApp()，使用 this 就可以拿到 app 实例
+- 通过 getApp() 获取实例之后，不要私自调用生命周期函数
+
+**app.js**
+
+```js
+App({
+  globalData: {
+    token: '',
+  },
+  setToken(token) {
+    this.globalData.token = token
+  },
+})
+```
+
+**my.wxml**
+
+```wxml
+<button type="primary" plain bind:tap="login">登录</button>
+```
+
+**my.js**
+
+```js
+const app = getApp()
+
+Page({
+  login() {
+    app.setToken('123456')
+  },
+})
+```
+
+**cart.js**
+
+```js
+const app = getApp()
+
+Page({
+  onShow() {
+    console.log(app.globalData.token)
+  },
+})
+```
+
+## 页面间通信
+
+如果一个页面通过 wx.navigateTo() 打开一个新页面，这两个页面间将建立一条数据通道
+
+- 在 wx.navigateTo() 的 success 回调函数中通过 EventChannel 对象触发事件
+- 被打开的页面可以通过 this.getOpenerEventChannel() 方法来获得一个 EventChannel 对象，进行监听、触发事件
+- wx.navigateTo 方法中可以定义 events 配置项接收被打开页面发射的事件
+
+**my.wxml**
+
+```wxml
+<button type="primary" plain bind:tap="clickHandler">跳转到list页面</button>
+```
+
+**my.js**
+
+```js
+Page({
+  clickHandler() {
+    wx.navigateTo({
+      url: '/pages/list/list',
+      events: {
+        listdata: (res) => {
+          console.log(res)
+        },
+      },
+      success(res) {
+        res.eventChannel.emit('myevent', {
+          name: '孙悟空',
+        })
+      },
+    })
+  },
+})
+```
+
+**list.js**
+
+```js
+Page({
+  onLoad() {
+    const eventChannel = this.getOpenerEventChannel()
+
+    eventChannel.on('myevent', (res) => {
+      console.log(res)
+    })
+
+    eventChannel.emit('listdata', {
+      age: 18,
+    })
+  },
+})
+```
+
+## 组件通信-事件总线
+
+随着项目功能的增加，业务逻辑也会变得很复杂，一个页面可能是由多个组件进行构成，并且这些组件之间需要进行数据的传递，这时候如果使用之前学习的组件传值方式进行数据的传递，就会比较麻烦
+
+事件总线是对发布-订阅模式的一种实现，是一种集中式事件处理机制，允许不同的组件之间进行彼此通信，常用于两个非父子关系组件和兄弟组件之间进行通信，我们可以借助第三方的发布订阅 JS 包，来实现事件总线的功能
+
+**my.wxml**
+
+```wxml
+<custom-eleven></custom-eleven>
+<custom-twelve></custom-twelve>
+```
+
+**custom-eleven.wxml**
+
+```wxml
+<view class="eleven">
+  <view>自定义组件11</view>
+  <button type="primary" bind:tap="clickHandler">传递数据给兄弟组件</button>
+</view>
+```
+
+**custom-eleven.js**
+
+```js
+import PubSub from 'pubsub-js'
+
+Component({
+  data: {
+    name: '孙悟空',
+    age: 18,
+  },
+  methods: {
+    clickHandler() {
+      PubSub.publish('myevent', this.data)
+    },
+  },
+})
+```
+
+**custom-twelve.wxml**
+
+```wxml
+<view class="twelve">
+  <view>自定义组件12</view>
+  <view>{{name}} {{age}}</view>
+</view>
+```
+
+**custom-twelve.js**
+
+```js
+import PubSub from 'pubsub-js'
+
+Component({
+  data: {
+    name: '',
+    age: '',
+  },
+  lifetimes: {
+    attached() {
+      PubSub.subscribe('myevent', (msg, data) => {
+        console.log(msg, data)
+        this.setData({
+          name: data.name,
+          age: data.age,
+        })
+      })
+    },
+  },
+})
+```
+
+## 自定义导航栏
+
+小程序默认的导航栏与 APP 一样都位于顶部固定位置，但是默认导航栏可能会影响小程序的整体风格，且无法满足特定的设计需求，这时候，就需要进行自定义导航栏
+
+在 app.json 或者 page.json 中，配置 navigationStyle 属性为 custom 即可自定义导航栏
+
+在设置以后，就会移除默认的导航栏，只保留右上角的胶囊按钮
+
+**cart.wxml**
+
+```wxml
+<swiper indicator-dots autoplay interval="3000" indicator-color="#fff" indicator-active-color="orange">
+  <swiper-item>
+    <image src="../../assets/img/01.jpg" mode="" />
+  </swiper-item>
+  <swiper-item>
+    <image src="../../assets/img/02.jpg" mode="" />
+  </swiper-item>
+  <swiper-item>
+    <image src="../../assets/img/03.jpg" mode="" />
+  </swiper-item>
+</swiper>
+```
+
+**cart.json**
+
+```json
+{
+  "usingComponents": {},
+  "navigationStyle": "custom"
+}
+```
