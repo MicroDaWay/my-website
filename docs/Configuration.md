@@ -270,6 +270,50 @@ export default {
 </html>
 ```
 
+```vue
+<script setup lang="ts">
+const containerRef = ref()
+
+const getScale = (width = 1920, height = 1080) => {
+  const w = window.innerWidth / width
+  const h = window.innerHeight / height
+  return w < h ? w : h
+}
+
+onMounted(() => {
+  containerRef.value.style.transform = `scale(${getScale()}) translate(-50%, -50%)`
+})
+
+window.onresize = () => {
+  containerRef.value.style.transform = `scale(${getScale()}) translate(-50%, -50%)`
+}
+</script>
+
+<template>
+  <div class="screen">
+    <div class="container" ref="containerRef">
+      <Top></Top>
+      <div class="bottom">
+        <div class="left">
+          <Tourist class="tourist"></Tourist>
+          <Gender class="gender"></Gender>
+          <Age class="age"></Age>
+        </div>
+        <div class="center">
+          <Map class="map"></Map>
+          <Line class="line"></Line>
+        </div>
+        <div class="right">
+          <Rank class="rank"></Rank>
+          <Contrast class="contrast"></Contrast>
+          <Reservation class="reservation"></Reservation>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+```
+
 ## axios 二次封装
 
 ```js
