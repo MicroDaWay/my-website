@@ -1,0 +1,30 @@
+.resume {
+  width: 850px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.introduce {
+  display: flex;
+}
+
+.right {
+  margin-left: 100px;
+}
+
+.skills {
+  padding-left: 20px;
+}
+
+.item {
+  font-weight: bold;
+}
+
+.content {
+  margin-left: 70px;
+}
+
+.repository {
+  margin-left: 80px;
+  list-style: none;
+}
