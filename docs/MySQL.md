@@ -68,7 +68,7 @@ FLUSH PRIVILEGES;
 
 ## SQL 语言的规则与规范
 
-基本规则
+**基本规则**
 
 - SQL 可以写在一行或者多行，为了提高可读性，各子句分行写，必要时使用缩进
 - 每条命令以 ; 或 \g 或 \G 结束
@@ -79,7 +79,7 @@ FLUSH PRIVILEGES;
   - 字符串型和日期时间类型的数据可以使用单引号(' ')表示
   - 列的别名，尽量使用双引号(" ")，而且不建议省略 as
 
-SQL 大小写规范 (建议遵守)
+**SQL 大小写规范(建议遵守)**
 
 - MySQL 在 Windows 环境下是大小写不敏感的
 - MySQL 在 Linux 环境下是大小写敏感的
@@ -89,7 +89,7 @@ SQL 大小写规范 (建议遵守)
   - 数据库名、表名、表别名、字段名、字段别名等都小写
   - SQL 关键字、函数名、绑定变量等都大写
 
-注释
+**注释**
 
 ```bash
 单行注释：# 注释文字(MySQL特有的方式)
@@ -97,7 +97,7 @@ SQL 大小写规范 (建议遵守)
 多行注释：/* 注释文字 */
 ```
 
-命名规则
+**命名规则**
 
 - 数据库、表名不得超过 30 个字符，变量名限制为 29 个
 - 必须只能包含 A–Z, a–z, 0–9, \_共 63 个字符
@@ -202,7 +202,7 @@ WHERE salary >= 10000;
 
 **等号运算符**
 
-- 等号运算符（=）判断等号两边的值、字符串或表达式是否相等，如果相等则返回 1，不相等则返回
+- 等号运算符(=)判断等号两边的值、字符串或表达式是否相等，如果相等则返回 1，不相等则返回
   0。
 - 在使用等号运算符时，遵循如下规则：
   - 如果等号两边的值、字符串或表达式都为字符串，则 MySQL 会按照字符串进行比较，其比较的是每个字符串中字符的 ANSI 编码是否相等
@@ -266,6 +266,7 @@ WHERE salary NOT IN (5000,6000,7000);
 **LIKE 运算符**
 
 %：匹配 0 个或多个字符
+
 \_：只能匹配一个字符
 
 ```sql
@@ -324,4 +325,85 @@ WHERE salary > 5000 OR department_id = 60;
 SELECT *
 FROM employees
 WHERE salary > 5000 XOR department_id = 60;
+```
+
+## 排序
+
+ASC(ascend): 升序
+
+DESC(descend)：降序
+
+列的别名只能在 ORDER BY 中使用，不能在 WHERE 中使用
+
+**单列排序**
+
+```sql
+SELECT employee_id,salary
+FROM employees
+ORDER BY salary ASC;
+
+SELECT employee_id,salary,salary * 12 as "annual_salary"
+FROM employees
+ORDER BY annual_salary DESC;
+```
+
+**多列排序**
+
+```sql
+SELECT employee_id,department_id,salary * 12 as "annual_salary"
+FROM employees
+WHERE department_id IN (50,60,70)
+ORDER BY department_id ASC,annual_salary DESC;
+```
+
+## 分页
+
+需求：每页显示 pageSize 条记录，此时显示第 pageNo 页
+
+公式：LIMIT (pageNo -1) \* pageSize,pageSize;
+
+LIMIT 的格式：LIMIT 位置偏移量,条目数
+
+结构 LIMIT 0,条目数 等价于 LIMIT 条目数
+
+```sql
+SELECT employee_id,salary
+FROM employees
+LIMIT 0,10;
+
+等价于
+
+SELECT employee_id,salary
+FROM employees
+LIMIT 10;
+```
+
+```sql
+SELECT employee_id,salary
+FROM employees
+LIMIT 31,2;
+
+MySQL8.0新特性
+
+SELECT employee_id,salary
+FROM employees
+LIMIT 2 OFFSET 31;
+```
+
+## 多表查询
+
+建议：从 sql 优化的角度，建议多表查询时，每个字段前都指明其所在的表
+
+如果给表起了别名，一旦在 SELECT 或 WHERE 中使用表名的话，则必须使用表的别名，而不能再使用表的原名
+
+如果有 n 个表实现多表的查询，则需要至少 n-1 个连接条件
+
+```sql
+SELECT employee_id,e.department_id
+FROM employees e,departments d
+WHERE e.department_id = d.department_id;
+
+SELECT employee_id,last_name,department_name,city
+FROM employees e,departments d,locations l
+WHERE e.department_id = d.department_id AND d.location_id = l.location_id;
 ```
