@@ -398,6 +398,8 @@ LIMIT 2 OFFSET 31;
 
 如果有 n 个表实现多表的查询，则需要至少 n-1 个连接条件
 
+**等值连接**
+
 ```sql
 SELECT employee_id,e.department_id
 FROM employees e,departments d
@@ -406,4 +408,222 @@ WHERE e.department_id = d.department_id;
 SELECT employee_id,last_name,department_name,city
 FROM employees e,departments d,locations l
 WHERE e.department_id = d.department_id AND d.location_id = l.location_id;
+```
+
+**非等值连接**
+
+```sql
+SELECT employee_id,salary,grade_level
+FROM employees e,job_grades jobs
+WHERE salary BETWEEN lowest_sal AND highest_sal
+ORDER BY salary DESC;
+```
+
+**自连接**
+
+```sql
+SELECT e1.employee_id,e1.salary,e2.employee_id,e2.salary
+FROM employees e1,employees e2
+WHERE e1.manager_id = e2.employee_id;
+```
+
+SQL92 语法实现外连接：使用 + ，但是 MySQL 不支持 SQL92 语法中外连接的写法
+
+```sql
+# MySQL 不支持这种写法
+SELECT employee_id,department_name
+FROM employees e,departments d
+WHERE e.department_id = e.department_id(+);
+```
+
+SQL99 实现 7 中 JOIN 操作
+
+**内连接**
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+JOIN departments d
+ON e.department_id = d.department_id;
+
+SELECT last_name,department_name,d.location_id
+FROM employees e
+JOIN departments d
+ON e.department_id = d.department_id
+JOIN locations l
+ON d.location_id = l.location_id;
+```
+
+**左外连接**
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+LEFT JOIN departments d
+ON e.department_id = d.department_id;
+```
+
+**右外连接**
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+RIGHT JOIN departments d
+ON e.department_id = d.department_id;
+```
+
+**满外连接**
+
+MySQL 不支持 FULL JOIN
+
+UNION 和 UNION ALL 的使用
+
+- UNION：会执行去重操作
+- UNION ALL：不会执行去重操作
+- 结论：如果明确知道合并数据后的结果数据不存在重复数据，或者不需要去除重复的数据，则尽量使用 UNION ALL 语句，以提高数据查询的效率
+
+```sql
+# MySQL 不支持 FULL JOIN
+SELECT last_name,department_name
+FROM employees e
+FULL JOIN departments d
+ON e.department_id = d.department_id;
+
+# 正确写法
+SELECT last_name,department_name
+FROM employees e
+LEFT JOIN departments d
+ON e.department_id = d.department_id
+UNION ALL
+SELECT last_name,department_name
+FROM employees e
+RIGHT JOIN departments d
+ON e.department_id = d.department_id
+WHERE e.department_id IS NULL;
+
+或者
+
+SELECT last_name,department_name
+FROM employees e
+RIGHT JOIN departments d
+ON e.department_id = d.department_id
+UNION ALL
+SELECT last_name,department_name
+FROM employees e
+LEFT JOIN departments d
+ON e.department_id = d.department_id
+WHERE d.department_id IS NULL;
+```
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+RIGHT JOIN departments d
+ON e.department_id = d.department_id
+WHERE e.department_id IS NULL;
+```
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+LEFT JOIN departments d
+ON e.department_id = d.department_id
+WHERE d.department_id IS NULL;
+```
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+LEFT JOIN departments d
+ON e.department_id = d.department_id
+WHERE d.department_id IS NULL
+UNION ALL
+SELECT last_name,department_name
+FROM employees e
+RIGHT JOIN departments d
+ON e.department_id = d.department_id
+WHERE e.department_id IS NULL;
+```
+
+SQL99 语法的新特性 1：自然连接
+
+NATURAL JOIN：它会帮你自动查询两张连接表中所有相同的字段，然后进行等值连接
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+JOIN departments d
+ON e.department_id = d.department_id
+AND e.manager_id = d.manager_id;
+
+等价于
+
+SELECT last_name,department_name
+FROM employees
+NATURAL JOIN departments;
+```
+
+SQL99 语法的新特性 2：USING
+
+```sql
+SELECT last_name,department_name
+FROM employees e
+JOIN departments d
+ON e.department_id = d.department_id
+
+等价于
+
+SELECT last_name,department_name
+FROM employees e
+JOIN departments d
+USING (department_id);
+```
+
+## 流程控制函数
+
+```sql
+SELECT employee_id,IF(salary >= 6000,'高工资','低工资') as "details"
+FROM employees;
+```
+
+```sql
+SELECT employee_id,salary * (1 + IF(commission_pct IS NOT NULL,commission_pct,0)) * 12 as "annual_salary"
+FROM employees;
+```
+
+```sql
+SELECT employee_id,salary,
+CASE
+    WHEN salary >= 10000 THEN "高收入"
+    WHEN salary >= 8000 THEN "中等收入"
+    WHEN salary >= 5000 THEN "一般收入"
+    ELSE "低收入"
+END "薪资状况"
+FROM employees;
+
+SELECT employee_id,salary,
+CASE department_id
+    WHEN 10 THEN salary * 1.1
+    WHEN 20 THEN salary * 1.2
+    WHEN 30 THEN salary * 1.3
+    ELSE salary * 1.4
+END "薪资"
+FROM employees;
+```
+
+## 加密解密
+
+PASSWORD() 在 MySQL8.0 中被弃用
+
+ENCODE()、DECODE() 在 MySQL8.0 中被弃用
+
+```sql
+# MySQL8.0 中被弃用
+SELECT PASSWORD('hello');
+
+SELECT ENCODE('microdaway','secret'),DECODE(ENCODE('microdaway','secret'),'secret');
+```
+
+```sql
+SELECT MD5('test'),SHA('hello');
 ```
