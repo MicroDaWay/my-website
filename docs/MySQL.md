@@ -627,3 +627,71 @@ SELECT ENCODE('microdaway','secret'),DECODE(ENCODE('microdaway','secret'),'secre
 ```sql
 SELECT MD5('test'),SHA('hello');
 ```
+
+## 五大常用的聚合函数
+
+AVG、SUM、MAX、MIN、COUNT 都会过滤 null
+
+```sql
+SELECT AVG(salary),SUM(salary)
+FROM employees;
+
+SELECT MAX(salary),MIN(salary)
+FROM employees;
+
+SELECT COUNT(employee_id),COUNT(1),COUNT(*)
+FROM employees;
+
+SELECT AVG(commission_pct),SUM(commission_pct) / COUNT(commission_pct),
+SUM(commission_pct) / COUNT(*)
+FROM employees;
+```
+
+**GROUP BY**
+
+结论：
+
+- SELECT 中出现的非组函数的字段必须声明在 GROUP BY 中，反之，GROUP BY 中声明的字段可以不出现在 SELECT 中
+- GROUP BY 声明在 FROM 后面、WHERE 后面、ORDER BY 前面、LIMIT 前面
+- MySQL 中 GROUP BY 中使用 WITH ROLLUP
+- 在 MySQL5.7 中使用 ROLLUP 时，不能同时使用 ORDER BY 子句进行结果排序，即 ROLLUP 和 ORDER bY 是互相排斥的
+
+```sql
+SELECT department_id,AVG(salary)
+FROM employees
+GROUP BY department_id;
+
+SELECT department_id,job_id,AVG(salary)
+FROM employees
+GROUP BY department_id,job_id;
+
+SELECT department_id,AVG(salary)
+FROM employees
+GROUP BY department_id WITH ROLLUP;
+```
+
+## HAVING 的使用与 SQL 语句的执行流程
+
+```sql
+SELECT department_id,MAX(salary)
+FROM employees
+GROUP BY department_id
+HAVING MAX(salary) > 10000
+ORDER BY MAX(salary) DESC;
+```
+
+**SQL 语句执行过程**
+
+```sql
+SELECT ...,(存在聚合函数)         ②
+
+FROM ...
+(LEFT | RIGHT) JOIN ...
+ON ... 多表的连接条件
+WHERE 不包含聚合函数的过滤条件     ①
+GROUP BY ...
+HAVING 包含聚合函数的过滤条件
+
+ORDER BY ... (ASC | DESC)        ③
+LIMIT ...
+```
