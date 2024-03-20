@@ -695,3 +695,160 @@ HAVING 包含聚合函数的过滤条件
 ORDER BY ... (ASC | DESC)        ③
 LIMIT ...
 ```
+
+## 数据库的创建、修改、删除
+
+**创建数据库**
+
+```sql
+CREATE DATABASE IF NOT EXISTS mytest1;
+
+SHOW CREATE DATABASE mytest1;
+
+# 创建数据库并指定字符集
+CREATE DATABASE IF NOT EXISTS mytest2 CHARACTER SET 'gbk';
+
+# 修改数据库字符集
+ALTER DATABASE mytest2 CHARACTER SET 'utf8mb4';
+```
+
+**显示所有的数据库**
+
+```sql
+SHOW DATABASES;
+```
+
+**切换数据库**
+
+```sql
+USE mytest1;
+```
+
+**显示当前的数据库**
+
+```sql
+SELECT DATABASE();
+```
+
+**删除数据库**
+
+```sql
+DROP DATABASE IF EXISTS mytest2;
+```
+
+```sql
+SHOW TABLES FROM mysql;
+```
+
+## 创建表
+
+```sql
+CREATE TABLE IF NOT EXISTS my_emp1 (
+id INT,
+emp_name VARCHAR(15),
+hire_date DATE
+);
+
+DESC my_emp1;
+
+SHOW CREATE TABLE my_emp1;
+
+CREATE TABLE my_emp2
+AS
+SELECT employee_id,last_name,salary
+FROM employees;
+
+SELECT *
+FROM my_emp2;
+
+CREATE TABLE my_emp3
+AS
+SELECT employee_id,last_name,department_name
+FROM employees e
+JOIN departments d
+ON e.department_id = d.department_id;
+
+# 创建一个表employee_copy，实现对employees表的复制，包括表数据
+CREATE TABLE employee_copy
+AS
+SELECT *
+FROM employees;
+
+# 创建一个表employee_blank，实现对employees表的复制，不包括表数据
+CREATE TABLE employee_blank
+AS
+SELECT *
+FROM employees
+WHERE 1 = 2;
+```
+
+## 修改表
+
+**添加字段**
+
+```sql
+# 默认添加到最后
+ALTER TABLE my_emp1
+ADD salary DOUBLE(10,2);
+
+# 添加到第一位
+ALTER TABLE my_emp1
+ADD phone_number VARCHAR(11) FIRST;
+
+# 添加到指定字段后面
+ALTER TABLE my_emp1
+ADD email VARCHAR(20) AFTER emp_name;
+```
+
+**修改字段：数据类型、长度、默认值**
+
+```sql
+ALTER TABLE my_emp1
+MODIFY email VARCHAR(30);
+
+ALTER TABLE my_emp1
+MODIFY email VARCHAR(30) DEFAULT 'xxx@outlook.com';
+```
+
+**重命名字段**
+
+```sql
+ALTER TABLE my_emp1
+CHANGE email my_email VARCHAR(40);
+
+ALTER TABLE my_emp1
+CHANGE salary my_salary DOUBLE(8,2);
+```
+
+**删除字段**
+
+```sql
+ALTER TABLE my_emp1
+DROP COLUMN my_salary;
+```
+
+**重命名表**
+
+```sql
+RENAME TABLE my_emp1
+TO my_emp11;
+
+ALTER TABLE my_emp11
+RENAME TO my_emp1;
+```
+
+**删除表**
+
+不光将表结构删除掉，同时表中的数据也删除掉，释放表空间
+
+```sql
+DROP TABLE IF EXISTS my_emp3;
+```
+
+**清空表**
+
+清空表中的所有数据，但是表结构保留
+
+```sql
+TRUNCATE TABLE employee_copy;
+```
