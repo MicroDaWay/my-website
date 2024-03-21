@@ -852,3 +852,206 @@ DROP TABLE IF EXISTS my_emp3;
 ```sql
 TRUNCATE TABLE employee_copy;
 ```
+
+## DCL 中 COMMIT 与 ROLLBACK 的使用
+
+COMMIT：提交数据，一旦执行 COMMIT，则数据就被永久的保存在了数据库中，意味着数据不可以回滚
+
+ROLLBACK：回滚数据，一旦执行 ROLLBACK，则可以实现数据的回滚，回滚到最近的一次 COMMIT 之后
+
+对比 TRUNCATE TABLE 和 DELETE FROM
+
+- 相同点：都可以实现对表中所有数据的删除，同时保留表结构
+- 不同点：
+  - TRUNCATE TABLE：一旦执行此操作，表数据全部清除，同时数据是不可以回滚的
+  - DELETE FROM：一旦执行此操作，表数据可以全部清除(不带 WHERE)，同时数据是可以实现回滚的
+
+DDL 和 DML 的说明
+
+- DDL 的操作一旦执行，就不可回滚，指令 SET autocommit = FALSE 对 DDL 操作失败
+- DML 的操作默认情况，一旦执行，也是不可回滚的，但是，如果在执行 DML 之前执行了 SET autocommit = FALSE，则执行的 DML 操作就可以实现回滚
+
+```sql
+# 可回滚
+COMMIT;
+
+SELECT *
+FROM my_emp2;
+
+SET autocommit = FALSE;
+
+DELETE FROM my_emp2;
+
+SELECT *
+FROM my_emp2;
+
+ROLLBACK;
+
+SELECT *
+FROM my_emp2;
+```
+
+```sql
+# 不可回滚
+COMMIT;
+
+SELECT *
+FROM my_emp2;
+
+SET autocommit = FALSE;
+
+TRUNCATE TABLE my_emp2;
+
+SELECT *
+FROM my_emp2;
+
+ROLLBACK;
+
+SELECT *
+FROM my_emp2;
+```
+
+## 视图
+
+视图的理解
+
+- 视图可以看作是一个虚拟表，本身是不存储数据的，视图的本质就可以看作是存储起来的 SELECT 语句
+- 视图中 SELECT 语句中涉及到的表，成为基表
+- 针对视图做 DML 操作，会影响到对应的基表中的数据，反之亦然
+- 视图本身的删除，不会导致基表中数据的删除
+- 视图的应用场景：针对于小型项目，不推荐使用视图，针对于大型项目，可以考虑使用视图
+- 视图的优点：简化查询，控制数据的访问
+
+```sql
+CREATE VIEW v_emp1
+AS
+SELECT employee_id,last_name,salary
+FROM emp;
+
+SELECT *
+FROM v_emp1;
+```
+
+```sql
+CREATE VIEW v_emp2
+AS
+SELECT employee_id as emp_id,last_name,salary
+FROM emp;
+
+SELECT *
+FROM v_emp2;
+```
+
+```sql
+CREATE VIEW v_emp3(emp_id,my_name,month_salary)
+AS
+SELECT employee_id,last_name,salary
+FROM emp;
+
+SELECT *
+FROM v_emp3;
+```
+
+```sql
+CREATE VIEW v_emp_dept
+AS
+SELECT employee_id,salary,department_name
+FROM emp e
+JOIN dept d
+ON e.department_id = d.department_id;
+
+SELECT *
+FROM v_emp_dept;
+```
+
+```sql
+CREATE VIEW v_emp_dept2
+AS
+SELECT CONCAT(last_name,'(',department_name,')') as "emp_info"
+FROM emp e
+JOIN dept d
+ON e.department_id = d.department_id;
+
+SELECT *
+FROM v_emp_dept2;
+```
+
+**基于视图创建视图**
+
+```sql
+CREATE VIEW v_emp4
+AS
+SELECT employee_id,last_name
+FROM v_emp1;
+
+SELECT *
+FROM v_emp4;
+```
+
+**查看视图**
+
+查看数据库的表对象、视图对象
+
+```sql
+SHOW TABLES;
+```
+
+查看视图的结构
+
+```sql
+DESC v_emp1;
+```
+
+查看视图的属性信息
+
+```sql
+SHOW TABLE STATUS LIKE 'v_emp1';
+```
+
+查看视图的详细定义信息
+
+```sql
+SHOW CREATE VIEW v_emp1;
+```
+
+**更新视图**
+
+```sql
+# 更新视图中的数据，会导致基表中数据的修改
+UPDATE v_emp1
+SET salary = 20000
+WHERE employee_id = 101;
+
+# 更新表中的数据，也会导致视图中数据的修改
+UPDATE emp
+SET salary = 10000
+WHERE employee_id = 101;
+
+# 删除视图中的数据，也会导致表中的数据被删除
+DELETE FROM v_emp1
+WHERE employee_id = 101;
+```
+
+**修改视图**
+
+```sql
+# 方式一
+CREATE OR REPLACE VIEW v_emp1
+AS
+SELECT employee_id,last_name,salary,email
+FROM emp;
+
+# 方式二
+ALTER VIEW v_emp1
+AS
+SELECT employee_id,last_name,salary,email,hire_date
+FROM emp;
+```
+
+**删除视图**
+
+```sql
+DROP VIEW v_emp3;
+
+DROP VIEW IF EXISTS v_emp4;
+```
