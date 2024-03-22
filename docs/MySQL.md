@@ -1055,3 +1055,238 @@ DROP VIEW v_emp3;
 
 DROP VIEW IF EXISTS v_emp4;
 ```
+
+## 存储过程
+
+**创建存储过程**
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE select_all_data()
+BEGIN
+      SELECT *
+      FROM employees;
+END //
+
+DELIMITER ;
+```
+
+**调用存储过程**
+
+```sql
+CALL select_all_data();
+```
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE avg_employee_salary()
+BEGIN
+      SELECT AVG(salary)
+      FROM employees;
+END //
+
+DELIMITER ;
+
+CALL avg_employee_salary();
+```
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE show_min_salary(OUT ms DOUBLE(8,2))
+BEGIN
+      SELECT min(salary) INTO ms
+      FROM employees;
+END //
+
+DELIMITER ;
+
+CALL show_min_salary(@ms);
+
+SELECT @ms;
+```
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE show_someone_salary(IN empname VARCHAR(25))
+BEGIN
+      SELECT salary
+      FROM employees
+      WHERE last_name = empname;
+END //
+
+DELIMITER ;
+
+# 调用方式一
+CALL show_someone_salary('Abel');
+
+# 调用方式二
+SET @empname = 'Abel';
+
+CALL show_someone_salary(@empname);
+```
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE show_someone_salary2(IN empname VARCHAR(25),OUT empsalary DOUBLE(8,2))
+BEGIN
+      SELECT salary INTO empsalary
+      FROM employees
+      WHERE last_name = empname;
+END //
+
+DELIMITER ;
+
+SET @empname = 'Abel';
+
+CALL show_someone_salary2(@empname,@empsalary);
+
+SELECT @empsalary;
+```
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE show_mgr_name(INOUT empname VARCHAR(25))
+BEGIN
+      SELECT last_name INTO empname
+      FROM employees
+      WHERE employee_id = (
+          SELECT manager_id
+          FROM employees
+          WHERE last_name = empname
+      );
+END //
+
+DELIMITER ;
+
+SET @empname = 'Abel';
+
+CALL show_mgr_name(@empname);
+
+SELECT @empname;
+```
+
+## 存储函数
+
+**创建存储函数**
+
+```sql
+DELIMITER //
+
+CREATE FUNCTION email_by_name()
+RETURNS VARCHAR(25)
+CONTAINS SQL
+DETERMINISTIC
+READS SQL DATA
+
+BEGIN
+      RETURN (
+        SELECT email
+        FROM employees
+        WHERE last_name = 'Abel'
+      );
+END //
+
+DELIMITER ;
+```
+
+**调用存储函数**
+
+```sql
+SELECT email_by_name();
+```
+
+```sql
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+DELIMITER //
+
+CREATE FUNCTION email_by_id(emp_id INT)
+RETURNS VARCHAR(25)
+
+BEGIN
+      RETURN (
+        SELECT email
+        FROM employees
+        WHERE employee_id = emp_id
+      );
+END //
+
+DELIMITER ;
+
+SELECT email_by_id(100);
+
+SET @emp_id := 101;
+
+SELECT email_by_id(@emp_id);
+```
+
+```sql
+DELIMITER //
+
+CREATE FUNCTION count_by_id(dept_id INT)
+RETURNS INT
+
+BEGIN
+      RETURN (
+        SELECT COUNT(*)
+        FROM employees
+        WHERE department_id = dept_id
+      );
+END //
+
+DELIMITER ;
+
+SET @dept_id = 50;
+
+SELECT count_by_id(@dept_id);
+```
+
+## 存储过程与函数的查看修改和删除
+
+```sql
+SHOW CREATE PROCEDURE show_min_salary;
+
+SHOW CREATE FUNCTION count_by_id;
+```
+
+```sql
+SHOW PROCEDURE STATUS;
+
+SHOW PROCEDURE STATUS LIKE 'show_min_salary';
+
+SHOW FUNCTION STATUS;
+
+SHOW FUNCTION STATUS LIKE 'count_by_id';
+```
+
+```sql
+SELECT *
+FROM information_schema.ROUTINES
+WHERE ROUTINE_NAME = 'email_by_id' AND ROUTINE_TYPE = 'FUNCTION';
+
+SELECT *
+FROM information_schema.ROUTINES
+WHERE ROUTINE_NAME = 'show_min_salary' AND ROUTINE_TYPE = 'PROCEDURE';
+```
+
+**存储过程、函数的修改**
+
+```sql
+ALTER PROCEDURE show_min_salary
+SQL SECURITY INVOKER
+COMMENT '查询最低工资';
+```
+
+**存储过程、函数的删除**
+
+```sql
+DROP FUNCTION IF EXISTS count_by_id;
+
+DROP PROCEDURE IF EXISTS show_min_salary;
+```
